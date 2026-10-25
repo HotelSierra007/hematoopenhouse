@@ -17,7 +17,7 @@
     <div id="app" class="flex-1 flex flex-col"></div>
 
     <script>
-        // ข้อมูลผลแล็บทั้ง 8 เคส
+        // ข้อมูลผลแล็บทั้ง 8 เคส (รวมรูปภาพ FISH, Bone marrow aspiration และ Osmotic fragility test)
         const casesData = {
             1: {
                 caseNumber: 1,
@@ -45,12 +45,12 @@
                     { id: 19, name: "Transferrin saturation", refRange: "20–50%", result: "85%" },
                     { id: 20, name: "Hemoglobin analysis (HPLC)", refRange: "HbA 95–98%; HbA₂ 2–3.5%; HbF <1%", result: "HbA 10%; HbA₂ 4.5%; HbF 85% (Beta-thal major pattern)" },
                     { id: 21, name: "EMA binding test", refRange: "Normal / no significant reduction in fluorescence", result: "Normal fluorescence intensity" },
-                    { id: 22, name: "Osmotic fragility test", refRange: "Normal; hemolysisเริ่มที่ประมาณ 0.45–0.50% NaCl", result: "Decreased fragility (hemolysis starts at 0.30% NaCl)" },
+                    { id: 22, name: "Osmotic fragility test", refRange: "Normal; hemolysisเริ่มที่ประมาณ 0.45–0.50% NaCl", result: "fish_img", image: "of_neg.jpg" },
                     { id: 23, name: "DAT / Coombs", refRange: "Negative", result: "Negative" },
                     { id: 24, name: "Indirect bilirubin", refRange: "0.2–0.8 mg/dL", result: "2.4 mg/dL" },
                     { id: 25, name: "LDH", refRange: "140–280 U/L", result: "480 U/L" },
                     { id: 26, name: "Serum haptoglobin", refRange: "30–200 mg/dL", result: "< 10 mg/dL" },
-                    { id: 27, name: "Bone marrow aspiration", refRange: "ไม่มี single numerical normal value; blasts <5% และมี normal hematopoietic maturation", result: "Erythroid hyperplasia อย่างมาก มี normoblast และ multinucleated erythroblast เด่นชัด" },
+                    { id: 27, name: "Bone marrow aspiration", refRange: "ไม่มี single numerical normal value; blasts <5% และมี normal hematopoietic maturation", result: "fish_img", image: "bm_12458.jpg" },
                     { id: 28, name: "Serum folate", refRange: ">4 ng/mL", result: "8.2 ng/mL" },
                     { id: 29, name: "Flow cytometry immunophenotyping", refRange: "ไม่มี abnormal clonal population; myeloid blasts โดยทั่วไป <5%", result: "ไม่พบ abnormal clonal population" },
                     { id: 30, name: "BCR::ABL1 detection (FISH)", refRange: "Negative", result: "fish_img", image: "fish_neg.jpg" },
@@ -92,12 +92,12 @@
                     { id: 19, name: "Transferrin saturation", refRange: "20–50%", result: "5%" },
                     { id: 20, name: "Hemoglobin analysis (HPLC)", refRange: "HbA 95–98%; HbA₂ 2–3.5%; HbF <1%", result: "HbA 97.5%; HbA₂ 2.0%; HbF 0.5%" },
                     { id: 21, name: "EMA binding test", refRange: "Normal / no significant reduction in fluorescence", result: "Normal" },
-                    { id: 22, name: "Osmotic fragility test", refRange: "Normal; hemolysisเริ่มที่ประมาณ 0.45–0.50% NaCl", result: "Normal" },
+                    { id: 22, name: "Osmotic fragility test", refRange: "Normal; hemolysisเริ่มที่ประมาณ 0.45–0.50% NaCl", result: "fish_img", image: "of_neg.jpg" },
                     { id: 23, name: "DAT / Coombs", refRange: "Negative", result: "Negative" },
                     { id: 24, name: "Indirect bilirubin", refRange: "0.2–0.8 mg/dL", result: "0.5 mg/dL" },
                     { id: 25, name: "LDH", refRange: "140–280 U/L", result: "190 U/L" },
                     { id: 26, name: "Serum haptoglobin", refRange: "30–200 mg/dL", result: "110 mg/dL" },
-                    { id: 27, name: "Bone marrow aspiration", refRange: "ไม่มี single numerical normal value; blasts <5% และมี normal hematopoietic maturation", result: "Erythroid hyperplasia อ่อน ๆ, ตรวจย้อม Prussian blue ไม่พบ iron ใน macrophage (absent iron stores)" },
+                    { id: 27, name: "Bone marrow aspiration", refRange: "ไม่มี single numerical normal value; blasts <5% และมี normal hematopoietic maturation", result: "fish_img", image: "bm_12458.jpg" },
                     { id: 28, name: "Serum folate", refRange: ">4 ng/mL", result: "6.5 ng/mL" },
                     { id: 29, name: "Flow cytometry immunophenotyping", refRange: "ไม่มี abnormal clonal population; myeloid blasts โดยทั่วไป <5%", result: "Normal" },
                     { id: 30, name: "BCR::ABL1 detection (FISH)", refRange: "Negative", result: "fish_img", image: "fish_neg.jpg" },
@@ -139,12 +139,12 @@
                     { id: 19, name: "Transferrin saturation", refRange: "20–50%", result: "30%" },
                     { id: 20, name: "Hemoglobin analysis (HPLC)", refRange: "HbA 95–98%; HbA₂ 2–3.5%; HbF <1%", result: "HbA 96%; HbA₂ 2.5%; HbF 1.5%" },
                     { id: 21, name: "EMA binding test", refRange: "Normal / no significant reduction in fluorescence", result: "Normal" },
-                    { id: 22, name: "Osmotic fragility test", refRange: "Normal; hemolysisเริ่มที่ประมาณ 0.45–0.50% NaCl", result: "Normal" },
+                    { id: 22, name: "Osmotic fragility test", refRange: "Normal; hemolysisเริ่มที่ประมาณ 0.45–0.50% NaCl", result: "fish_img", image: "of_neg.jpg" },
                     { id: 23, name: "DAT / Coombs", refRange: "Negative", result: "Negative" },
                     { id: 24, name: "Indirect bilirubin", refRange: "0.2–0.8 mg/dL", result: "0.6 mg/dL" },
                     { id: 25, name: "LDH", refRange: "140–280 U/L", result: "850 U/L" },
                     { id: 26, name: "Serum haptoglobin", refRange: "30–200 mg/dL", result: "95 mg/dL" },
-                    { id: 27, name: "Bone marrow aspiration", refRange: "ไม่มี single numerical normal value; blasts <5% และมี normal hematopoietic maturation", result: "Marked myeloid hyperplasia, M:E ratio > 10:1, eosinophils และ basophils เพิ่มขึ้น, blasts 3%" },
+                    { id: 27, name: "Bone marrow aspiration", refRange: "ไม่มี single numerical normal value; blasts <5% และมี normal hematopoietic maturation", result: "fish_img", image: "bm_37.jpg" },
                     { id: 28, name: "Serum folate", refRange: ">4 ng/mL", result: "7.0 ng/mL" },
                     { id: 29, name: "Flow cytometry immunophenotyping", refRange: "ไม่มี abnormal clonal population; myeloid blasts โดยทั่วไป <5%", result: "Myeloid cells เจริญเติบโตทุกระยะครบถ้วน ไม่พบ blastเพิ่มสูงผิดปกติแบบ acute leukemia" },
                     { id: 30, name: "BCR::ABL1 detection (FISH)", refRange: "Negative", result: "fish_img", image: "fish_pos.jpg" },
@@ -186,12 +186,12 @@
                     { id: 19, name: "Transferrin saturation", refRange: "20–50%", result: "90%" },
                     { id: 20, name: "Hemoglobin analysis (HPLC)", refRange: "HbA 95–98%; HbA₂ 2–3.5%; HbF <1%", result: "HbA 5%; HbA₂ 4.0%; HbF 91%" },
                     { id: 21, name: "EMA binding test", refRange: "Normal / no significant reduction in fluorescence", result: "Normal" },
-                    { id: 22, name: "Osmotic fragility test", refRange: "Normal; hemolysisเริ่มที่ประมาณ 0.45–0.50% NaCl", result: "Decreased fragility" },
+                    { id: 22, name: "Osmotic fragility test", refRange: "Normal; hemolysisเริ่มที่ประมาณ 0.45–0.50% NaCl", result: "fish_img", image: "of_neg.jpg" },
                     { id: 23, name: "DAT / Coombs", refRange: "Negative", result: "Negative" },
                     { id: 24, name: "Indirect bilirubin", refRange: "0.2–0.8 mg/dL", result: "2.8 mg/dL" },
                     { id: 25, name: "LDH", refRange: "140–280 U/L", result: "520 U/L" },
                     { id: 26, name: "Serum haptoglobin", refRange: "30–200 mg/dL", result: "< 10 mg/dL" },
-                    { id: 27, name: "Bone marrow aspiration", refRange: "ไม่มี single numerical normal value; blasts <5% และมี normal hematopoietic maturation", result: "Marked erythroid hyperplasia" },
+                    { id: 27, name: "Bone marrow aspiration", refRange: "ไม่มี single numerical normal value; blasts <5% และมี normal hematopoietic maturation", result: "fish_img", image: "bm_12458.jpg" },
                     { id: 28, name: "Serum folate", refRange: ">4 ng/mL", result: "7.5 ng/mL" },
                     { id: 29, name: "Flow cytometry immunophenotyping", refRange: "ไม่มี abnormal clonal population; myeloid blasts โดยทั่วไป <5%", result: "Normal" },
                     { id: 30, name: "BCR::ABL1 detection (FISH)", refRange: "Negative", result: "fish_img", image: "fish_neg.jpg" },
@@ -233,12 +233,12 @@
                     { id: 19, name: "Transferrin saturation", refRange: "20–50%", result: "35%" },
                     { id: 20, name: "Hemoglobin analysis (HPLC)", refRange: "HbA 95–98%; HbA₂ 2–3.5%; HbF <1%", result: "Normal" },
                     { id: 21, name: "EMA binding test", refRange: "Normal / no significant reduction in fluorescence", result: "Reduced fluorescence (Mean fluorescence intensity decreased by 25%)" },
-                    { id: 22, name: "Osmotic fragility test", refRange: "Normal; hemolysisเริ่มที่ประมาณ 0.45–0.50% NaCl", result: "Increased fragility (hemolysis starts at 0.65% NaCl)" },
+                    { id: 22, name: "Osmotic fragility test", refRange: "Normal; hemolysisเริ่มที่ประมาณ 0.45–0.50% NaCl", result: "fish_img", image: "of_pos.jpg" },
                     { id: 23, name: "DAT / Coombs", refRange: "Negative", result: "Negative" },
                     { id: 24, name: "Indirect bilirubin", refRange: "0.2–0.8 mg/dL", result: "3.1 mg/dL" },
                     { id: 25, name: "LDH", refRange: "140–280 U/L", result: "410 U/L" },
                     { id: 26, name: "Serum haptoglobin", refRange: "30–200 mg/dL", result: "< 10 mg/dL" },
-                    { id: 27, name: "Bone marrow aspiration", refRange: "ไม่มี single numerical normal value; blasts <5% และมี normal hematopoietic maturation", result: "Normoblastic erythroid hyperplasia" },
+                    { id: 27, name: "Bone marrow aspiration", refRange: "ไม่มี single numerical normal value; blasts <5% และมี normal hematopoietic maturation", result: "fish_img", image: "bm_12458.jpg" },
                     { id: 28, name: "Serum folate", refRange: ">4 ng/mL", result: "5.1 ng/mL" },
                     { id: 29, name: "Flow cytometry immunophenotyping", refRange: "ไม่มี abnormal clonal population; myeloid blasts โดยทั่วไป <5%", result: "Normal" },
                     { id: 30, name: "BCR::ABL1 detection (FISH)", refRange: "Negative", result: "fish_img", image: "fish_neg.jpg" },
@@ -280,12 +280,12 @@
                     { id: 19, name: "Transferrin saturation", refRange: "20–50%", result: "59%" },
                     { id: 20, name: "Hemoglobin analysis (HPLC)", refRange: "HbA 95–98%; HbA₂ 2–3.5%; HbF <1%", result: "Normal pattern" },
                     { id: 21, name: "EMA binding test", refRange: "Normal / no significant reduction in fluorescence", result: "Normal" },
-                    { id: 22, name: "Osmotic fragility test", refRange: "Normal; hemolysisเริ่มที่ประมาณ 0.45–0.50% NaCl", result: "Normal" },
+                    { id: 22, name: "Osmotic fragility test", refRange: "Normal; hemolysisเริ่มที่ประมาณ 0.45–0.50% NaCl", result: "fish_img", image: "of_neg.jpg" },
                     { id: 23, name: "DAT / Coombs", refRange: "Negative", result: "Negative" },
                     { id: 24, name: "Indirect bilirubin", refRange: "0.2–0.8 mg/dL", result: "0.7 mg/dL" },
                     { id: 25, name: "LDH", refRange: "140–280 U/L", result: "680 U/L" },
                     { id: 26, name: "Serum haptoglobin", refRange: "30–200 mg/dL", result: "80 mg/dL" },
-                    { id: 27, name: "Bone marrow aspiration", refRange: "ไม่มี single numerical normal value; blasts <5% และมี normal hematopoietic maturation", result: "Hypercellular marrow, Myeloblasts 52% พร้อม Auer rods (AML-M2)" },
+                    { id: 27, name: "Bone marrow aspiration", refRange: "ไม่มี single numerical normal value; blasts <5% และมี normal hematopoietic maturation", result: "fish_img", image: "bm_6.jpg" },
                     { id: 28, name: "Serum folate", refRange: ">4 ng/mL", result: "6.0 ng/mL" },
                     { id: 29, name: "Flow cytometry immunophenotyping", refRange: "ไม่มี abnormal clonal population; myeloid blasts โดยทั่วไป <5%", result: "Blasts แสดง myeloid markers: CD13+, CD33+, CD34+, HLA-DR+, MPO+" },
                     { id: 30, name: "BCR::ABL1 detection (FISH)", refRange: "Negative", result: "fish_img", image: "fish_neg.jpg" },
@@ -327,12 +327,12 @@
                     { id: 19, name: "Transferrin saturation", refRange: "20–50%", result: "32%" },
                     { id: 20, name: "Hemoglobin analysis (HPLC)", refRange: "HbA 95–98%; HbA₂ 2–3.5%; HbF <1%", result: "Normal" },
                     { id: 21, name: "EMA binding test", refRange: "Normal / no significant reduction in fluorescence", result: "Normal" },
-                    { id: 22, name: "Osmotic fragility test", refRange: "Normal; hemolysisเริ่มที่ประมาณ 0.45–0.50% NaCl", result: "Normal" },
+                    { id: 22, name: "Osmotic fragility test", refRange: "Normal; hemolysisเริ่มที่ประมาณ 0.45–0.50% NaCl", result: "fish_img", image: "of_neg.jpg" },
                     { id: 23, name: "DAT / Coombs", refRange: "Negative", result: "Negative" },
                     { id: 24, name: "Indirect bilirubin", refRange: "0.2–0.8 mg/dL", result: "0.7 mg/dL" },
                     { id: 25, name: "LDH", refRange: "140–280 U/L", result: "920 U/L" },
                     { id: 26, name: "Serum haptoglobin", refRange: "30–200 mg/dL", result: "90 mg/dL" },
-                    { id: 27, name: "Bone marrow aspiration", refRange: "ไม่มี single numerical normal value; blasts <5% และมี normal hematopoietic maturation", result: "Marked myeloid hyperplasia, M:E > 12:1, basophilia เด่นชัด" },
+                    { id: 27, name: "Bone marrow aspiration", refRange: "ไม่มี single numerical normal value; blasts <5% และมี normal hematopoietic maturation", result: "fish_img", image: "bm_37.jpg" },
                     { id: 28, name: "Serum folate", refRange: ">4 ng/mL", result: "6.8 ng/mL" },
                     { id: 29, name: "Flow cytometry immunophenotyping", refRange: "ไม่มี abnormal clonal population; myeloid blasts โดยทั่วไป <5%", result: "Normal maturation series" },
                     { id: 30, name: "BCR::ABL1 detection (FISH)", refRange: "Negative", result: "fish_img", image: "fish_pos.jpg" },
@@ -374,12 +374,12 @@
                     { id: 19, name: "Transferrin saturation", refRange: "20–50%", result: "4%" },
                     { id: 20, name: "Hemoglobin analysis (HPLC)", refRange: "HbA 95–98%; HbA₂ 2–3.5%; HbF <1%", result: "Normal" },
                     { id: 21, name: "EMA binding test", refRange: "Normal / no significant reduction in fluorescence", result: "Normal" },
-                    { id: 22, name: "Osmotic fragility test", refRange: "Normal; hemolysisเริ่มที่ประมาณ 0.45–0.50% NaCl", result: "Normal" },
+                    { id: 22, name: "Osmotic fragility test", refRange: "Normal; hemolysisเริ่มที่ประมาณ 0.45–0.50% NaCl", result: "fish_img", image: "of_neg.jpg" },
                     { id: 23, name: "DAT / Coombs", refRange: "Negative", result: "Negative" },
                     { id: 24, name: "Indirect bilirubin", refRange: "0.2–0.8 mg/dL", result: "0.4 mg/dL" },
                     { id: 25, name: "LDH", refRange: "140–280 U/L", result: "185 U/L" },
                     { id: 26, name: "Serum haptoglobin", refRange: "30–200 mg/dL", result: "115 mg/dL" },
-                    { id: 27, name: "Bone marrow aspiration", refRange: "ไม่มี single numerical normal value; blasts <5% และมี normal hematopoietic maturation", result: "Absent iron stores (Prussian blue negative)" },
+                    { id: 27, name: "Bone marrow aspiration", refRange: "ไม่มี single numerical normal value; blasts <5% และมี normal hematopoietic maturation", result: "fish_img", image: "bm_12458.jpg" },
                     { id: 28, name: "Serum folate", refRange: ">4 ng/mL", result: "5.8 ng/mL" },
                     { id: 29, name: "Flow cytometry immunophenotyping", refRange: "ไม่มี abnormal clonal population; myeloid blasts โดยทั่วไป <5%", result: "Normal" },
                     { id: 30, name: "BCR::ABL1 detection (FISH)", refRange: "Negative", result: "fish_img", image: "fish_neg.jpg" },
@@ -671,7 +671,7 @@
             if (lab.result === 'fish_img') {
                 resultHtml = `
                     <div class="text-center">
-                        <img src="${lab.image}" alt="FISH Result" class="max-h-72 mx-auto rounded-xl border border-slate-700 shadow-md">
+                        <img src="${lab.image}" alt="Lab Result Image" class="max-h-72 mx-auto rounded-xl border border-slate-700 shadow-md">
                     </div>
                 `;
             } else {
@@ -750,7 +750,7 @@
                                         <h4 class="font-semibold text-white text-sm mt-1">${lab.name}</h4>
                                     </div>
                                     <div class="text-right">
-                                        <span class="text-xs text-emerald-400 font-medium">${lab.result === 'fish_img' ? '[รูปผล FISH]' : 'ผล: ' + lab.result}</span>
+                                        <span class="text-xs text-emerald-400 font-medium">${lab.result === 'fish_img' ? '[รูปผลตรวจ]' : 'ผล: ' + lab.result}</span>
                                         <p class="text-xs text-indigo-400 mt-0.5">คลิกดูรายละเอียด &rarr;</p>
                                     </div>
                                 </div>
