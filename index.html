@@ -1,0 +1,817 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hematology Open House - Lab Ordering System</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Prompt:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        body { font-family: 'Prompt', sans-serif; }
+        .glass { background: rgba(30, 41, 59, 0.7); backdrop-filter: blur(12px); }
+    </style>
+</head>
+<body class="bg-slate-950 text-slate-100 min-h-screen flex flex-col">
+
+    <!-- App Root -->
+    <div id="app" class="flex-1 flex flex-col"></div>
+
+    <script>
+        // ข้อมูลผลแล็บทั้ง 8 เคส (40 รายการครบถ้วน)
+        const casesData = {
+            1: {
+                caseNumber: 1,
+                title: "คนที่ 1 β-thal major",
+                subtitle: "จากพ่อแม่ที่มีอย่างน้อย 1 คนเป็น beta thalassemia major",
+                labs: [
+                    { id: 1, name: "Hemoglobin (Hb)", refRange: "ชาย 13–17 g/dL; หญิง 12–16 g/dL", result: "6.5 g/dL", interpretation: "↓" },
+                    { id: 2, name: "Mean corpuscular volume (MCV)", refRange: "80–100 fL", result: "65 fL", interpretation: "↓" },
+                    { id: 3, name: "Mean corpuscular hemoglobin (MCH)", refRange: "27–33 pg", result: "19 pg", interpretation: "↓" },
+                    { id: 4, name: "Red cell distribution width (RDW)", refRange: "11.5–14.5%", result: "24%", interpretation: "↑" },
+                    { id: 5, name: "RBC count", refRange: "ชาย 4.5–5.9 ×10⁶/µL; หญิง 4.1–5.1 ×10⁶/µL", result: "3.4 ×10⁶/µL", interpretation: "↓" },
+                    { id: 6, name: "WBC count", refRange: "4.0–10.0 ×10³/µL", result: "10.5 ×10³/µL", interpretation: "↑ จากการติดเชื้อง่าย ?" },
+                    { id: 7, name: "WBC differential count", refRange: "Neutrophil 40–75%; lymphocyte 20–45%; monocyte 2–10%; eosinophil 1–6%; basophil 0–2%", result: "Neutrophil 62%\nLymphocyte 33%\nMonocyte 4%\nEosinophil 1%\nBasophil 0%", interpretation: "N" },
+                    { id: 8, name: "Platelet count", refRange: "150–400 ×10³/µL", result: "210 ×10³/µL", interpretation: "N" },
+                    { id: 9, name: "Corrected reticulocyte count", refRange: "0.5–2.0%", result: "4.50%", interpretation: "↑" },
+                    { id: 10, name: "Serum vitamin B12", refRange: "200–900 pg/mL", result: "450 pg/mL", interpretation: "N" },
+                    { id: 11, name: "Absolute neutrophil count (ANC)", refRange: "1.5–8.0 ×10³/µL", result: "6.5 ×10³/µL", interpretation: "N" },
+                    { id: 12, name: "MCHC", refRange: "32–36 g/dL", result: "29 g/dL", interpretation: "↓" },
+                    { id: 13, name: "Nucleated RBC count", refRange: "0 ×10³/µL ในผู้ใหญ่", result: "15 ×10³/µL", interpretation: "↑" },
+                    { id: 14, name: "Prothrombin time", refRange: "PT 11–14 s", result: "12.5 s", interpretation: "N" },
+                    { id: 15, name: "ESR", refRange: "ชาย 0–15 mm/hr; หญิง 0–20 mm/hr", result: "25 mm/hr", interpretation: "↑" },
+                    { id: 16, name: "Serum ferritin", refRange: "ชาย 30–400 ng/mL; หญิง 15–150 ng/mL", result: "450 ng/mL", interpretation: "↑" },
+                    { id: 17, name: "Serum iron", refRange: "60–150 µg/dL", result: "180 µg/dL", interpretation: "↑" },
+                    { id: 18, name: "TIBC", refRange: "240–450 µg/dL", result: "210 µg/dL", interpretation: "↓" },
+                    { id: 19, name: "Transferrin saturation", refRange: "20–50%", result: "85%", interpretation: "↑" },
+                    { id: 20, name: "Hemoglobin analysis (HPLC)", refRange: "HbA 95–98%; HbA₂ 2–3.5%; HbF <1%", result: "HbA 10%; HbA₂ 4.5%; HbF 85%", interpretation: "Abnormal (Beta-thalassemia major pattern)" },
+                    { id: 21, name: "EMA binding test", refRange: "Normal / no significant reduction in fluorescence", result: "Normal fluorescence intensity", interpretation: "N" },
+                    { id: 22, name: "Osmotic fragility test", refRange: "Normal; hemolysisเริ่มที่ประมาณ 0.45–0.50% NaCl", result: "Decreased fragility (hemolysis starts at 0.30% NaCl)", interpretation: "↓" },
+                    { id: 23, name: "DAT / Coombs", refRange: "Negative", result: "Negative", interpretation: "N" },
+                    { id: 24, name: "Indirect bilirubin", refRange: "0.2–0.8 mg/dL", result: "2.4 mg/dL", interpretation: "↑" },
+                    { id: 25, name: "LDH", refRange: "140–280 U/L", result: "480 U/L", interpretation: "↑" },
+                    { id: 26, name: "Serum haptoglobin", refRange: "30–200 mg/dL", result: "< 10 mg/dL", interpretation: "↓" },
+                    { id: 27, name: "Bone marrow aspiration", refRange: "ไม่มี single numerical normal value; blasts <5% และมี normal hematopoietic maturation", result: "Erythroid hyperplasia อย่างมาก มี normoblast และ multinucleated erythroblast เด่นชัด", interpretation: "Abnormal" },
+                    { id: 28, name: "Serum folate", refRange: ">4 ng/mL", result: "8.2 ng/mL", interpretation: "N" },
+                    { id: 29, name: "Flow cytometry immunophenotyping", refRange: "ไม่มี abnormal clonal population; myeloid blasts โดยทั่วไป <5%", result: "ไม่พบ abnormal clonal population", interpretation: "N" },
+                    { id: 30, name: "BCR::ABL1 detection (FISH)", refRange: "Negative", result: "Negative", interpretation: "N" },
+                    { id: 31, name: "Fasting blood glucose", refRange: "70–99 mg/dL", result: "90 mg/dL", interpretation: "N" },
+                    { id: 32, name: "HbA1c", refRange: "<5.7%", result: "5.4%", interpretation: "N" },
+                    { id: 33, name: "BUN", refRange: "7–20 mg/dL", result: "12 mg/dL", interpretation: "N" },
+                    { id: 34, name: "Creatinine", refRange: "ชาย 0.74–1.35 mg/dL; หญิง 0.59–1.04 mg/dL", result: "0.8 mg/dL", interpretation: "N" },
+                    { id: 35, name: "AST", refRange: "10–40 U/L", result: "32 U/L", interpretation: "N" },
+                    { id: 36, name: "ALT", refRange: "7–56 U/L", result: "28 U/L", interpretation: "N" },
+                    { id: 37, name: "Serum sodium", refRange: "135–145 mmol/L", result: "140 mmol/L", interpretation: "N" },
+                    { id: 38, name: "Serum potassium", refRange: "3.5–5.0 mmol/L", result: "4.2 mmol/L", interpretation: "N" },
+                    { id: 39, name: "Stool occult blood test", refRange: "Negative", result: "Negative", interpretation: "N" },
+                    { id: 40, name: "C-reactive protein (CRP)", refRange: "<5 mg/L", result: "2.1 mg/L", interpretation: "N" }
+                ]
+            },
+            2: {
+                caseNumber: 2,
+                title: "คนที่ 2 IDA",
+                subtitle: "Crohn's disease",
+                labs: [
+                    { id: 1, name: "Hemoglobin (Hb)", refRange: "ชาย 13–17 g/dL; หญิง 12–16 g/dL", result: "8.9 g/dL", interpretation: "↓" },
+                    { id: 2, name: "Mean corpuscular volume (MCV)", refRange: "80–100 fL", result: "68 fL", interpretation: "↓" },
+                    { id: 3, name: "Mean corpuscular hemoglobin (MCH)", refRange: "27–33 pg", result: "21 pg", interpretation: "↓" },
+                    { id: 4, name: "Red cell distribution width (RDW)", refRange: "11.5–14.5%", result: "18%", interpretation: "↑" },
+                    { id: 5, name: "RBC count", refRange: "ชาย 4.5–5.9 ×10⁶/µL; หญิง 4.1–5.1 ×10⁶/µL", result: "4.0 × 10⁶/µL", interpretation: "↓" },
+                    { id: 6, name: "WBC count", refRange: "4.0–10.0 ×10³/µL", result: "12.7 ×10³/µL", interpretation: "↑" },
+                    { id: 7, name: "WBC differential count", refRange: "Neutrophil 40–75%; lymphocyte 20–45%; monocyte 2–10%; eosinophil 1–6%; basophil 0–2%", result: "Neutrophil 72%, Lymphocyte 18%, Monocye 7%, Eosinophil 2%, Basophil 1%", interpretation: "N" },
+                    { id: 8, name: "Platelet count", refRange: "150–400 ×10³/µL", result: "480 ×10³/µL", interpretation: "↑" },
+                    { id: 9, name: "Corrected reticulocyte count", refRange: "0.5–2.0%", result: "0.70%", interpretation: "N" },
+                    { id: 10, name: "Serum vitamin B12", refRange: "200–900 pg/mL", result: "350 pg/mL", interpretation: "N" },
+                    { id: 11, name: "Absolute neutrophil count (ANC)", refRange: "1.5–8.0 ×10³/µL", result: "9.1 ×10³/µL", interpretation: "↑" },
+                    { id: 12, name: "MCHC", refRange: "32–36 g/dL", result: "30 g/dL", interpretation: "↓" },
+                    { id: 13, name: "Nucleated RBC count", refRange: "0 ×10³/µL ในผู้ใหญ่", result: "0 ×10³/µL", interpretation: "N" },
+                    { id: 14, name: "Prothrombin time", refRange: "PT 11–14 s", result: "13.0 s", interpretation: "N" },
+                    { id: 15, name: "ESR", refRange: "ชาย 0–15 mm/hr; หญิง 0–20 mm/hr", result: "42 mm/hr", interpretation: "↑" },
+                    { id: 16, name: "Serum ferritin", refRange: "ชาย 30–400 ng/mL; หญิง 15–150 ng/mL", result: "8 ng/mL", interpretation: "↓" },
+                    { id: 17, name: "Serum iron", refRange: "60–150 µg/dL", result: "25 µg/dL", interpretation: "↓" },
+                    { id: 18, name: "TIBC", refRange: "240–450 µg/dL", result: "480 µg/dL", interpretation: "↑" },
+                    { id: 19, name: "Transferrin saturation", refRange: "20–50%", result: "5%", interpretation: "↓" },
+                    { id: 20, name: "Hemoglobin analysis (HPLC)", refRange: "HbA 95–98%; HbA₂ 2–3.5%; HbF <1%", result: "HbA 97.5%; HbA₂ 2.0%; HbF 0.5%", interpretation: "N" },
+                    { id: 21, name: "EMA binding test", refRange: "Normal / no significant reduction in fluorescence", result: "Normal", interpretation: "N" },
+                    { id: 22, name: "Osmotic fragility test", refRange: "Normal; hemolysisเริ่มที่ประมาณ 0.45–0.50% NaCl", result: "Normal", interpretation: "N" },
+                    { id: 23, name: "DAT / Coombs", refRange: "Negative", result: "Negative", interpretation: "N" },
+                    { id: 24, name: "Indirect bilirubin", refRange: "0.2–0.8 mg/dL", result: "0.5 mg/dL", interpretation: "N" },
+                    { id: 25, name: "LDH", refRange: "140–280 U/L", result: "190 U/L", interpretation: "N" },
+                    { id: 26, name: "Serum haptoglobin", refRange: "30–200 mg/dL", result: "110 mg/dL", interpretation: "N" },
+                    { id: 27, name: "Bone marrow aspiration", refRange: "ไม่มี single numerical normal value; blasts <5% และมี normal hematopoietic maturation", result: "Erythroid hyperplasia อ่อน ๆ, ตรวจย้อม Prussian blue ไม่พบ iron ใน macrophage (absent iron stores)", interpretation: "Abnormal" },
+                    { id: 28, name: "Serum folate", refRange: ">4 ng/mL", result: "6.5 ng/mL", interpretation: "N" },
+                    { id: 29, name: "Flow cytometry immunophenotyping", refRange: "ไม่มี abnormal clonal population; myeloid blasts โดยทั่วไป <5%", result: "Normal", interpretation: "N" },
+                    { id: 30, name: "BCR::ABL1 detection (FISH)", refRange: "Negative", result: "Negative", interpretation: "N" },
+                    { id: 31, name: "Fasting blood glucose", refRange: "70–99 mg/dL", result: "88 mg/dL", interpretation: "N" },
+                    { id: 32, name: "HbA1c", refRange: "<5.7%", result: "5.2%", interpretation: "N" },
+                    { id: 33, name: "BUN", refRange: "7–20 mg/dL", result: "14 mg/dL", interpretation: "N" },
+                    { id: 34, name: "Creatinine", refRange: "ชาย 0.74–1.35 mg/dL; หญิง 0.59–1.04 mg/dL", result: "0.7 mg/dL", interpretation: "N" },
+                    { id: 35, name: "AST", refRange: "10–40 U/L", result: "22 U/L", interpretation: "N" },
+                    { id: 36, name: "ALT", refRange: "7–56 U/L", result: "19 U/L", interpretation: "N" },
+                    { id: 37, name: "Serum sodium", refRange: "135–145 mmol/L", result: "138 mmol/L", interpretation: "N" },
+                    { id: 38, name: "Serum potassium", refRange: "3.5–5.0 mmol/L", result: "4.0 mmol/L", interpretation: "N" },
+                    { id: 39, name: "Stool occult blood test", refRange: "Negative", result: "Positive", interpretation: "Positive" },
+                    { id: 40, name: "C-reactive protein (CRP)", refRange: "<5 mg/L", result: "24 mg/L", interpretation: "↑" }
+                ]
+            },
+            3: {
+                caseNumber: 3,
+                title: "คนที่ 3 CML",
+                subtitle: "Chronic Myeloid Leukemia",
+                labs: [
+                    { id: 1, name: "Hemoglobin (Hb)", refRange: "ชาย 13–17 g/dL; หญิง 12–16 g/dL", result: "10.8 g/dL", interpretation: "↓" },
+                    { id: 2, name: "Mean corpuscular volume (MCV)", refRange: "80–100 fL", result: "88 fL", interpretation: "N" },
+                    { id: 3, name: "Mean corpuscular hemoglobin (MCH)", refRange: "27–33 pg", result: "29 pg", interpretation: "N" },
+                    { id: 4, name: "Red cell distribution width (RDW)", refRange: "11.5–14.5%", result: "18%", interpretation: "↑" },
+                    { id: 5, name: "RBC count", refRange: "ชาย 4.5–5.9 ×10⁶/µL; หญิง 4.1–5.1 ×10⁶/µL", result: "3.7 ×10⁶/µL", interpretation: "↓" },
+                    { id: 6, name: "WBC count", refRange: "4.0–10.0 ×10³/µL", result: "165 ×10³/µL", interpretation: "↑↑" },
+                    { id: 7, name: "WBC differential count", refRange: "Neutrophil 40–75%; lymphocyte 20–45%; monocyte 2–10%; eosinophil 1–6%; basophil 0–2%", result: "Neutrophil 63%, Lymphocyte 5%, Monocyte 3%, Eosinophil 2%, Basophil 6%, Myelocyte 10%, Metamyelocyte 7%, Promyelocyte 2%, Blast 2%", interpretation: "Abnormal (Leukoerythroblastic picture)" },
+                    { id: 8, name: "Platelet count", refRange: "150–400 ×10³/µL", result: "620 ×10³/µL", interpretation: "↑" },
+                    { id: 9, name: "Corrected reticulocyte count", refRange: "0.5–2.0%", result: "1.20%", interpretation: "N" },
+                    { id: 10, name: "Serum vitamin B12", refRange: "200–900 pg/mL", result: "1,500 pg/mL", interpretation: "↑" },
+                    { id: 11, name: "Absolute neutrophil count (ANC)", refRange: "1.5–8.0 ×10³/µL", result: "130 ×10³/µL", interpretation: "↑↑" },
+                    { id: 12, name: "MCHC", refRange: "32–36 g/dL", result: "33 g/dL", interpretation: "N" },
+                    { id: 13, name: "Nucleated RBC count", refRange: "0 ×10³/µL ในผู้ใหญ่", result: "2 ×10³/µL", interpretation: "↑" },
+                    { id: 14, name: "Prothrombin time", refRange: "PT 11–14 s", result: "12.0 s", interpretation: "N" },
+                    { id: 15, name: "ESR", refRange: "ชาย 0–15 mm/hr; หญิง 0–20 mm/hr", result: "35 mm/hr", interpretation: "↑" },
+                    { id: 16, name: "Serum ferritin", refRange: "ชาย 30–400 ng/mL; หญิง 15–150 ng/mL", result: "220 ng/mL", interpretation: "N" },
+                    { id: 17, name: "Serum iron", refRange: "60–150 µg/dL", result: "90 µg/dL", interpretation: "N" },
+                    { id: 18, name: "TIBC", refRange: "240–450 µg/dL", result: "300 µg/dL", interpretation: "N" },
+                    { id: 19, name: "Transferrin saturation", refRange: "20–50%", result: "30%", interpretation: "N" },
+                    { id: 20, name: "Hemoglobin analysis (HPLC)", refRange: "HbA 95–98%; HbA₂ 2–3.5%; HbF <1%", result: "HbA 96%; HbA₂ 2.5%; HbF 1.5%", interpretation: "N" },
+                    { id: 21, name: "EMA binding test", refRange: "Normal / no significant reduction in fluorescence", result: "Normal", interpretation: "N" },
+                    { id: 22, name: "Osmotic fragility test", refRange: "Normal; hemolysisเริ่มที่ประมาณ 0.45–0.50% NaCl", result: "Normal", interpretation: "N" },
+                    { id: 23, name: "DAT / Coombs", refRange: "Negative", result: "Negative", interpretation: "N" },
+                    { id: 24, name: "Indirect bilirubin", refRange: "0.2–0.8 mg/dL", result: "0.6 mg/dL", interpretation: "N" },
+                    { id: 25, name: "LDH", refRange: "140–280 U/L", result: "850 U/L", interpretation: "↑↑" },
+                    { id: 26, name: "Serum haptoglobin", refRange: "30–200 mg/dL", result: "95 mg/dL", interpretation: "N" },
+                    { id: 27, name: "Bone marrow aspiration", refRange: "ไม่มี single numerical normal value; blasts <5% และมี normal hematopoietic maturation", result: "Marked myeloid hyperplasia, M:E ratio > 10:1, eosinophils และ basophils เพิ่มขึ้น, blasts 3%", interpretation: "Abnormal" },
+                    { id: 28, name: "Serum folate", refRange: ">4 ng/mL", result: "7.0 ng/mL", interpretation: "N" },
+                    { id: 29, name: "Flow cytometry immunophenotyping", refRange: "ไม่มี abnormal clonal population; myeloid blasts โดยทั่วไป <5%", result: "Myeloid cells เจริญเติบโตทุกระยะครบถ้วน ไม่พบ blastเพิ่มสูงผิดปกติแบบ acute leukemia", interpretation: "N" },
+                    { id: 30, name: "BCR::ABL1 detection (FISH)", refRange: "Negative", result: "Positive (t(9;22) BCR::ABL1 fusion detected)", interpretation: "Positive" },
+                    { id: 31, name: "Fasting blood glucose", refRange: "70–99 mg/dL", result: "92 mg/dL", interpretation: "N" },
+                    { id: 32, name: "HbA1c", refRange: "<5.7%", result: "5.5%", interpretation: "N" },
+                    { id: 33, name: "BUN", refRange: "7–20 mg/dL", result: "15 mg/dL", interpretation: "N" },
+                    { id: 34, name: "Creatinine", refRange: "ชาย 0.74–1.35 mg/dL; หญิง 0.59–1.04 mg/dL", result: "0.9 mg/dL", interpretation: "N" },
+                    { id: 35, name: "AST", refRange: "10–40 U/L", result: "28 U/L", interpretation: "N" },
+                    { id: 36, name: "ALT", refRange: "7–56 U/L", result: "31 U/L", interpretation: "N" },
+                    { id: 37, name: "Serum sodium", refRange: "135–145 mmol/L", result: "139 mmol/L", interpretation: "N" },
+                    { id: 38, name: "Serum potassium", refRange: "3.5–5.0 mmol/L", result: "4.4 mmol/L", interpretation: "N" },
+                    { id: 39, name: "Stool occult blood test", refRange: "Negative", result: "Negative", interpretation: "N" },
+                    { id: 40, name: "C-reactive protein (CRP)", refRange: "<5 mg/L", result: "4.0 mg/L", interpretation: "N" }
+                ]
+            },
+            4: {
+                caseNumber: 4,
+                title: "คนที่ 4 β-thal major",
+                subtitle: "จากพ่อแม่ที่มีอย่างน้อย 1 คนเป็น beta thalassemia major",
+                labs: [
+                    { id: 1, name: "Hemoglobin (Hb)", refRange: "ชาย 13–17 g/dL; หญิง 12–16 g/dL", result: "6.2 g/dL", interpretation: "↓" },
+                    { id: 2, name: "Mean corpuscular volume (MCV)", refRange: "80–100 fL", result: "62 fL", interpretation: "↓" },
+                    { id: 3, name: "Mean corpuscular hemoglobin (MCH)", refRange: "27–33 pg", result: "18 pg", interpretation: "↓" },
+                    { id: 4, name: "Red cell distribution width (RDW)", refRange: "11.5–14.5%", result: "26%", interpretation: "↑" },
+                    { id: 5, name: "RBC count", refRange: "ชาย 4.5–5.9 ×10⁶/µL; หญิง 4.1–5.1 ×10⁶/µL", result: "3.3 ×10⁶/µL", interpretation: "↓" },
+                    { id: 6, name: "WBC count", refRange: "4.0–10.0 ×10³/µL", result: "11.2 ×10³/µL", interpretation: "↑ จากการติดเชื้อง่าย ?" },
+                    { id: 7, name: "WBC differential count", refRange: "Neutrophil 40–75%; lymphocyte 20–45%; monocyte 2–10%; eosinophil 1–6%; basophil 0–2%", result: "Neutrophil 61%\nLymphocyte 34%\nMonocyte 4%\nEosinophil 1%\nBasophil 0%", interpretation: "N" },
+                    { id: 8, name: "Platelet count", refRange: "150–400 ×10³/µL", result: "230 ×10³/µL", interpretation: "N" },
+                    { id: 9, name: "Corrected reticulocyte count", refRange: "0.5–2.0%", result: "5.00%", interpretation: "↑" },
+                    { id: 10, name: "Serum vitamin B12", refRange: "200–900 pg/mL", result: "520 pg/mL", interpretation: "N" },
+                    { id: 11, name: "Absolute neutrophil count (ANC)", refRange: "1.5–8.0 ×10³/µL", result: "6.8 ×10³/µL", interpretation: "N" },
+                    { id: 12, name: "MCHC", refRange: "32–36 g/dL", result: "28 g/dL", interpretation: "↓" },
+                    { id: 13, name: "Nucleated RBC count", refRange: "0 ×10³/µL ในผู้ใหญ่", result: "18 ×10³/µL", interpretation: "↑" },
+                    { id: 14, name: "Prothrombin time", refRange: "PT 11–14 s", result: "13.2 s", interpretation: "N" },
+                    { id: 15, name: "ESR", refRange: "ชาย 0–15 mm/hr; หญิง 0–20 mm/hr", result: "28 mm/hr", interpretation: "↑" },
+                    { id: 16, name: "Serum ferritin", refRange: "ชาย 30–400 ng/mL; หญิง 15–150 ng/mL", result: "520 ng/mL", interpretation: "↑" },
+                    { id: 17, name: "Serum iron", refRange: "60–150 µg/dL", result: "195 µg/dL", interpretation: "↑" },
+                    { id: 18, name: "TIBC", refRange: "240–450 µg/dL", result: "190 µg/dL", interpretation: "↓" },
+                    { id: 19, name: "Transferrin saturation", refRange: "20–50%", result: "90%", interpretation: "↑" },
+                    { id: 20, name: "Hemoglobin analysis (HPLC)", refRange: "HbA 95–98%; HbA₂ 2–3.5%; HbF <1%", result: "HbA 5%; HbA₂ 4.0%; HbF 91%", interpretation: "Abnormal" },
+                    { id: 21, name: "EMA binding test", refRange: "Normal / no significant reduction in fluorescence", result: "Normal", interpretation: "N" },
+                    { id: 22, name: "Osmotic fragility test", refRange: "Normal; hemolysisเริ่มที่ประมาณ 0.45–0.50% NaCl", result: "Decreased fragility", interpretation: "↓" },
+                    { id: 23, name: "DAT / Coombs", refRange: "Negative", result: "Negative", interpretation: "N" },
+                    { id: 24, name: "Indirect bilirubin", refRange: "0.2–0.8 mg/dL", result: "2.8 mg/dL", interpretation: "↑" },
+                    { id: 25, name: "LDH", refRange: "140–280 U/L", result: "520 U/L", interpretation: "↑" },
+                    { id: 26, name: "Serum haptoglobin", refRange: "30–200 mg/dL", result: "< 10 mg/dL", interpretation: "↓" },
+                    { id: 27, name: "Bone marrow aspiration", refRange: "ไม่มี single numerical normal value; blasts <5% และมี normal hematopoietic maturation", result: "Marked erythroid hyperplasia", interpretation: "Abnormal" },
+                    { id: 28, name: "Serum folate", refRange: ">4 ng/mL", result: "7.5 ng/mL", interpretation: "N" },
+                    { id: 29, name: "Flow cytometry immunophenotyping", refRange: "ไม่มี abnormal clonal population; myeloid blasts โดยทั่วไป <5%", result: "Normal", interpretation: "N" },
+                    { id: 30, name: "BCR::ABL1 detection (FISH)", refRange: "Negative", result: "Negative", interpretation: "N" },
+                    { id: 31, name: "Fasting blood glucose", refRange: "70–99 mg/dL", result: "85 mg/dL", interpretation: "N" },
+                    { id: 32, name: "HbA1c", refRange: "<5.7%", result: "5.1%", interpretation: "N" },
+                    { id: 33, name: "BUN", refRange: "7–20 mg/dL", result: "11 mg/dL", interpretation: "N" },
+                    { id: 34, name: "Creatinine", refRange: "ชาย 0.74–1.35 mg/dL; หญิง 0.59–1.04 mg/dL", result: "0.7 mg/dL", interpretation: "N" },
+                    { id: 35, name: "AST", refRange: "10–40 U/L", result: "35 U/L", interpretation: "N" },
+                    { id: 36, name: "ALT", refRange: "7–56 U/L", result: "30 U/L", interpretation: "N" },
+                    { id: 37, name: "Serum sodium", refRange: "135–145 mmol/L", result: "141 mmol/L", interpretation: "N" },
+                    { id: 38, name: "Serum potassium", refRange: "3.5–5.0 mmol/L", result: "4.1 mmol/L", interpretation: "N" },
+                    { id: 39, name: "Stool occult blood test", refRange: "Negative", result: "Negative", interpretation: "N" },
+                    { id: 40, name: "C-reactive protein (CRP)", refRange: "<5 mg/L", result: "1.8 mg/L", interpretation: "N" }
+                ]
+            },
+            5: {
+                caseNumber: 5,
+                title: "คนที่ 5 HS",
+                subtitle: "Hereditary Spherocytosis",
+                labs: [
+                    { id: 1, name: "Hemoglobin (Hb)", refRange: "ชาย 13–17 g/dL; หญิง 12–16 g/dL", result: "9.2 g/dL", interpretation: "↓" },
+                    { id: 2, name: "Mean corpuscular volume (MCV)", refRange: "80–100 fL", result: "86 fL", interpretation: "N" },
+                    { id: 3, name: "Mean corpuscular hemoglobin (MCH)", refRange: "27–33 pg", result: "29 pg", interpretation: "N" },
+                    { id: 4, name: "Red cell distribution width (RDW)", refRange: "11.5–14.5%", result: "18%", interpretation: "↑" },
+                    { id: 5, name: "RBC count", refRange: "ชาย 4.5–5.9 ×10⁶/µL; หญิง 4.1–5.1 ×10⁶/µL", result: "3.2 ×10⁶/µL", interpretation: "↓" },
+                    { id: 6, name: "WBC count", refRange: "4.0–10.0 ×10³/µL", result: "9.8 ×10³/µL", interpretation: "N" },
+                    { id: 7, name: "WBC differential count", refRange: "Neutrophil 40–75%; lymphocyte 20–45%; monocyte 2–10%; eosinophil 1–6%; basophil 0–2%", result: "Neutrophil 62%\nLymphocyte 33%\nMonocyte 4%\nEosinophil 1%\nBasophil 0%", interpretation: "N" },
+                    { id: 8, name: "Platelet count", refRange: "150–400 ×10³/µL", result: "450 ×10³/µL", interpretation: "↑" },
+                    { id: 9, name: "Corrected reticulocyte count", refRange: "0.5–2.0%", result: "7.00%", interpretation: "↑" },
+                    { id: 10, name: "Serum vitamin B12", refRange: "200–900 pg/mL", result: "480 pg/mL", interpretation: "N" },
+                    { id: 11, name: "Absolute neutrophil count (ANC)", refRange: "1.5–8.0 ×10³/µL", result: "6.1 ×10³/µL", interpretation: "N" },
+                    { id: 12, name: "MCHC", refRange: "32–36 g/dL", result: "37 g/dL", interpretation: "↑" },
+                    { id: 13, name: "Nucleated RBC count", refRange: "0 ×10³/µL ในผู้ใหญ่", result: "0 ×10³/µL", interpretation: "N" },
+                    { id: 14, name: "Prothrombin time", refRange: "PT 11–14 s", result: "12.2 s", interpretation: "N" },
+                    { id: 15, name: "ESR", refRange: "ชาย 0–15 mm/hr; หญิง 0–20 mm/hr", result: "15 mm/hr", interpretation: "N" },
+                    { id: 16, name: "Serum ferritin", refRange: "ชาย 30–400 ng/mL; หญิง 15–150 ng/mL", result: "120 ng/mL", interpretation: "N" },
+                    { id: 17, name: "Serum iron", refRange: "60–150 µg/dL", result: "110 µg/dL", interpretation: "N" },
+                    { id: 18, name: "TIBC", refRange: "240–450 µg/dL", result: "310 µg/dL", interpretation: "N" },
+                    { id: 19, name: "Transferrin saturation", refRange: "20–50%", result: "35%", interpretation: "N" },
+                    { id: 20, name: "Hemoglobin analysis (HPLC)", refRange: "HbA 95–98%; HbA₂ 2–3.5%; HbF <1%", result: "Normal", interpretation: "N" },
+                    { id: 21, name: "EMA binding test", refRange: "Normal / no significant reduction in fluorescence", result: "Reduced fluorescence (Mean fluorescence intensity decreased by 25%)", interpretation: "Abnormal" },
+                    { id: 22, name: "Osmotic fragility test", refRange: "Normal; hemolysisเริ่มที่ประมาณ 0.45–0.50% NaCl", result: "Increased fragility (hemolysis starts at 0.65% NaCl)", interpretation: "↑" },
+                    { id: 23, name: "DAT / Coombs", refRange: "Negative", result: "Negative", interpretation: "N" },
+                    { id: 24, name: "Indirect bilirubin", refRange: "0.2–0.8 mg/dL", result: "3.1 mg/dL", interpretation: "↑" },
+                    { id: 25, name: "LDH", refRange: "140–280 U/L", result: "410 U/L", interpretation: "↑" },
+                    { id: 26, name: "Serum haptoglobin", refRange: "30–200 mg/dL", result: "< 10 mg/dL", interpretation: "↓" },
+                    { id: 27, name: "Bone marrow aspiration", refRange: "ไม่มี single numerical normal value; blasts <5% และมี normal hematopoietic maturation", result: "Normoblastic erythroid hyperplasia", interpretation: "Abnormal" },
+                    { id: 28, name: "Serum folate", refRange: ">4 ng/mL", result: "5.1 ng/mL", interpretation: "N" },
+                    { id: 29, name: "Flow cytometry immunophenotyping", refRange: "ไม่มี abnormal clonal population; myeloid blasts โดยทั่วไป <5%", result: "Normal", interpretation: "N" },
+                    { id: 30, name: "BCR::ABL1 detection (FISH)", refRange: "Negative", result: "Negative", interpretation: "N" },
+                    { id: 31, name: "Fasting blood glucose", refRange: "70–99 mg/dL", result: "95 mg/dL", interpretation: "N" },
+                    { id: 32, name: "HbA1c", refRange: "<5.7%", result: "5.3%", interpretation: "N" },
+                    { id: 33, name: "BUN", refRange: "7–20 mg/dL", result: "13 mg/dL", interpretation: "N" },
+                    { id: 34, name: "Creatinine", refRange: "ชาย 0.74–1.35 mg/dL; หญิง 0.59–1.04 mg/dL", result: "0.8 mg/dL", interpretation: "N" },
+                    { id: 35, name: "AST", refRange: "10–40 U/L", result: "25 U/L", interpretation: "N" },
+                    { id: 36, name: "ALT", refRange: "7–56 U/L", result: "22 U/L", interpretation: "N" },
+                    { id: 37, name: "Serum sodium", refRange: "135–145 mmol/L", result: "140 mmol/L", interpretation: "N" },
+                    { id: 38, name: "Serum potassium", refRange: "3.5–5.0 mmol/L", result: "4.3 mmol/L", interpretation: "N" },
+                    { id: 39, name: "Stool occult blood test", refRange: "Negative", result: "Negative", interpretation: "N" },
+                    { id: 40, name: "C-reactive protein (CRP)", refRange: "<5 mg/L", result: "1.2 mg/L", interpretation: "N" }
+                ]
+            },
+            6: {
+                caseNumber: 6,
+                title: "คนที่ 6 AML",
+                subtitle: "Acute Myeloid Leukemia (M2)",
+                labs: [
+                    { id: 1, name: "Hemoglobin (Hb)", refRange: "ชาย 13–17 g/dL; หญิง 12–16 g/dL", result: "7.1 g/dL", interpretation: "↓" },
+                    { id: 2, name: "Mean corpuscular volume (MCV)", refRange: "80–100 fL", result: "88 fL", interpretation: "N" },
+                    { id: 3, name: "Mean corpuscular hemoglobin (MCH)", refRange: "27–33 pg", result: "29 pg", interpretation: "N" },
+                    { id: 4, name: "Red cell distribution width (RDW)", refRange: "11.5–14.5%", result: "19%", interpretation: "↑" },
+                    { id: 5, name: "RBC count", refRange: "ชาย 4.5–5.9 ×10⁶/µL; หญิง 4.1–5.1 ×10⁶/µL", result: "2.5 ×10⁶/µL", interpretation: "↓" },
+                    { id: 6, name: "WBC count", refRange: "4.0–10.0 ×10³/µL", result: "2.1 ×10³/µL", interpretation: "↓" },
+                    { id: 7, name: "WBC differential count", refRange: "Neutrophil 40–75%; lymphocyte 20–45%; monocyte 2–10%; eosinophil 1–6%; basophil 0–2%", result: "Neutrophil 17%, Lymphocyte 33%, Monocyte 3%, Eosinophil 1%, Blast 46%", interpretation: "Abnormal (Circulating blasts present)" },
+                    { id: 8, name: "Platelet count", refRange: "150–400 ×10³/µL", result: "65 ×10³/µL", interpretation: "↓" },
+                    { id: 9, name: "Corrected reticulocyte count", refRange: "0.5–2.0%", result: "0.40%", interpretation: "↓" },
+                    { id: 10, name: "Serum vitamin B12", refRange: "200–900 pg/mL", result: "650 pg/mL", interpretation: "N" },
+                    { id: 11, name: "Absolute neutrophil count (ANC)", refRange: "1.5–8.0 ×10³/µL", result: "0.36 ×10³/µL", interpretation: "↓" },
+                    { id: 12, name: "MCHC", refRange: "32–36 g/dL", result: "33 g/dL", interpretation: "N" },
+                    { id: 13, name: "Nucleated RBC count", refRange: "0 ×10³/µL ในผู้ใหญ่", result: "0 ×10³/µL", interpretation: "N" },
+                    { id: 14, name: "Prothrombin time", refRange: "PT 11–14 s", result: "15.5 s", interpretation: "↑" },
+                    { id: 15, name: "ESR", refRange: "ชาย 0–15 mm/hr; หญิง 0–20 mm/hr", result: "60 mm/hr", interpretation: "↑" },
+                    { id: 16, name: "Serum ferritin", refRange: "ชาย 30–400 ng/mL; หญิง 15–150 ng/mL", result: "850 ng/mL", interpretation: "↑" },
+                    { id: 17, name: "Serum iron", refRange: "60–150 µg/dL", result: "130 µg/dL", interpretation: "N" },
+                    { id: 18, name: "TIBC", refRange: "240–450 µg/dL", result: "220 µg/dL", interpretation: "↓" },
+                    { id: 19, name: "Transferrin saturation", refRange: "20–50%", result: "59%", interpretation: "↑" },
+                    { id: 20, name: "Hemoglobin analysis (HPLC)", refRange: "HbA 95–98%; HbA₂ 2–3.5%; HbF <1%", result: "Normal pattern", interpretation: "N" },
+                    { id: 21, name: "EMA binding test", refRange: "Normal / no significant reduction in fluorescence", result: "Normal", interpretation: "N" },
+                    { id: 22, name: "Osmotic fragility test", refRange: "Normal; hemolysisเริ่มที่ประมาณ 0.45–0.50% NaCl", result: "Normal", interpretation: "N" },
+                    { id: 23, name: "DAT / Coombs", refRange: "Negative", result: "Negative", interpretation: "N" },
+                    { id: 24, name: "Indirect bilirubin", refRange: "0.2–0.8 mg/dL", result: "0.7 mg/dL", interpretation: "N" },
+                    { id: 25, name: "LDH", refRange: "140–280 U/L", result: "680 U/L", interpretation: "↑" },
+                    { id: 26, name: "Serum haptoglobin", refRange: "30–200 mg/dL", result: "80 mg/dL", interpretation: "N" },
+                    { id: 27, name: "Bone marrow aspiration", refRange: "ไม่มี single numerical normal value; blasts <5% และมี normal hematopoietic maturation", result: "Hypercellular marrow, Myeloblasts 52% พร้อม Auer rods (AML-M2)", interpretation: "Abnormal" },
+                    { id: 28, name: "Serum folate", refRange: ">4 ng/mL", result: "6.0 ng/mL", interpretation: "N" },
+                    { id: 29, name: "Flow cytometry immunophenotyping", refRange: "ไม่มี abnormal clonal population; myeloid blasts โดยทั่วไป <5%", result: "Blasts แสดง myeloid markers: CD13+, CD33+, CD34+, HLA-DR+, MPO+", interpretation: "Abnormal" },
+                    { id: 30, name: "BCR::ABL1 detection (FISH)", refRange: "Negative", result: "Negative", interpretation: "N" },
+                    { id: 31, name: "Fasting blood glucose", refRange: "70–99 mg/dL", result: "90 mg/dL", interpretation: "N" },
+                    { id: 32, name: "HbA1c", refRange: "<5.7%", result: "5.3%", interpretation: "N" },
+                    { id: 33, name: "BUN", refRange: "7–20 mg/dL", result: "18 mg/dL", interpretation: "N" },
+                    { id: 34, name: "Creatinine", refRange: "ชาย 0.74–1.35 mg/dL; หญิง 0.59–1.04 mg/dL", result: "1.1 mg/dL", interpretation: "N" },
+                    { id: 35, name: "AST", refRange: "10–40 U/L", result: "38 U/L", interpretation: "N" },
+                    { id: 36, name: "ALT", refRange: "7–56 U/L", result: "32 U/L", interpretation: "N" },
+                    { id: 37, name: "Serum sodium", refRange: "135–145 mmol/L", result: "136 mmol/L", interpretation: "N" },
+                    { id: 38, name: "Serum potassium", refRange: "3.5–5.0 mmol/L", result: "4.5 mmol/L", interpretation: "N" },
+                    { id: 39, name: "Stool occult blood test", refRange: "Negative", result: "Negative", interpretation: "N" },
+                    { id: 40, name: "C-reactive protein (CRP)", refRange: "<5 mg/L", result: "12.5 mg/L", interpretation: "↑" }
+                ]
+            },
+            7: {
+                caseNumber: 7,
+                title: "คนที่ 7 CML",
+                subtitle: "Chronic Myeloid Leukemia",
+                labs: [
+                    { id: 1, name: "Hemoglobin (Hb)", refRange: "ชาย 13–17 g/dL; หญิง 12–16 g/dL", result: "9.6 g/dL", interpretation: "↓" },
+                    { id: 2, name: "Mean corpuscular volume (MCV)", refRange: "80–100 fL", result: "90 fL", interpretation: "N" },
+                    { id: 3, name: "Mean corpuscular hemoglobin (MCH)", refRange: "27–33 pg", result: "30 pg", interpretation: "N" },
+                    { id: 4, name: "Red cell distribution width (RDW)", refRange: "11.5–14.5%", result: "17%", interpretation: "↑" },
+                    { id: 5, name: "RBC count", refRange: "ชาย 4.5–5.9 ×10⁶/µL; หญิง 4.1–5.1 ×10⁶/µL", result: "3.3 ×10⁶/µL", interpretation: "↓" },
+                    { id: 6, name: "WBC count", refRange: "4.0–10.0 ×10³/µL", result: "185 ×10³/µL", interpretation: "↑↑" },
+                    { id: 7, name: "WBC differential count", refRange: "Neutrophil 40–75%; lymphocyte 20–45%; monocyte 2–10%; eosinophil 1–6%; basophil 0–2%", result: "Neutrophil 61%, Lymphocyte 6%, Monocyte 3%, Eosinophil 3%, Basophil 7%, Myelocyte 9%, Metamyelocyte 8%, Promyelocyte 2%, Blast 1%", interpretation: "Abnormal" },
+                    { id: 8, name: "Platelet count", refRange: "150–400 ×10³/µL", result: "710 ×10³/µL", interpretation: "↑" },
+                    { id: 9, name: "Corrected reticulocyte count", refRange: "0.5–2.0%", result: "1.00%", interpretation: "N" },
+                    { id: 10, name: "Serum vitamin B12", refRange: "200–900 pg/mL", result: "1,800 pg/mL", interpretation: "↑" },
+                    { id: 11, name: "Absolute neutrophil count (ANC)", refRange: "1.5–8.0 ×10³/µL", result: "145 ×10³/µL", interpretation: "↑↑" },
+                    { id: 12, name: "MCHC", refRange: "32–36 g/dL", result: "33 g/dL", interpretation: "N" },
+                    { id: 13, name: "Nucleated RBC count", refRange: "0 ×10³/µL ในผู้ใหญ่", result: "1 ×10³/µL", interpretation: "↑" },
+                    { id: 14, name: "Prothrombin time", refRange: "PT 11–14 s", result: "12.4 s", interpretation: "N" },
+                    { id: 15, name: "ESR", refRange: "ชาย 0–15 mm/hr; หญิง 0–20 mm/hr", result: "40 mm/hr", interpretation: "↑" },
+                    { id: 16, name: "Serum ferritin", refRange: "ชาย 30–400 ng/mL; หญิง 15–150 ng/mL", result: "280 ng/mL", interpretation: "N" },
+                    { id: 17, name: "Serum iron", refRange: "60–150 µg/dL", result: "95 µg/dL", interpretation: "N" },
+                    { id: 18, name: "TIBC", refRange: "240–450 µg/dL", result: "290 µg/dL", interpretation: "N" },
+                    { id: 19, name: "Transferrin saturation", refRange: "20–50%", result: "32%", interpretation: "N" },
+                    { id: 20, name: "Hemoglobin analysis (HPLC)", refRange: "HbA 95–98%; HbA₂ 2–3.5%; HbF <1%", result: "Normal", interpretation: "N" },
+                    { id: 21, name: "EMA binding test", refRange: "Normal / no significant reduction in fluorescence", result: "Normal", interpretation: "N" },
+                    { id: 22, name: "Osmotic fragility test", refRange: "Normal; hemolysisเริ่มที่ประมาณ 0.45–0.50% NaCl", result: "Normal", interpretation: "N" },
+                    { id: 23, name: "DAT / Coombs", refRange: "Negative", result: "Negative", interpretation: "N" },
+                    { id: 24, name: "Indirect bilirubin", refRange: "0.2–0.8 mg/dL", result: "0.7 mg/dL", interpretation: "N" },
+                    { id: 25, name: "LDH", refRange: "140–280 U/L", result: "920 U/L", interpretation: "↑↑" },
+                    { id: 26, name: "Serum haptoglobin", refRange: "30–200 mg/dL", result: "90 mg/dL", interpretation: "N" },
+                    { id: 27, name: "Bone marrow aspiration", refRange: "ไม่มี single numerical normal value; blasts <5% และมี normal hematopoietic maturation", result: "Marked myeloid hyperplasia, M:E > 12:1, basophilia เด่นชัด", interpretation: "Abnormal" },
+                    { id: 28, name: "Serum folate", refRange: ">4 ng/mL", result: "6.8 ng/mL", interpretation: "N" },
+                    { id: 29, name: "Flow cytometry immunophenotyping", refRange: "ไม่มี abnormal clonal population; myeloid blasts โดยทั่วไป <5%", result: "Normal maturation series", interpretation: "N" },
+                    { id: 30, name: "BCR::ABL1 detection (FISH)", refRange: "Negative", result: "Positive (t(9;22) detected)", interpretation: "Positive" },
+                    { id: 31, name: "Fasting blood glucose", refRange: "70–99 mg/dL", result: "89 mg/dL", interpretation: "N" },
+                    { id: 32, name: "HbA1c", refRange: "<5.7%", result: "5.4%", interpretation: "N" },
+                    { id: 33, name: "BUN", refRange: "7–20 mg/dL", result: "14 mg/dL", interpretation: "N" },
+                    { id: 34, name: "Creatinine", refRange: "ชาย 0.74–1.35 mg/dL; หญิง 0.59–1.04 mg/dL", result: "0.8 mg/dL", interpretation: "N" },
+                    { id: 35, name: "AST", refRange: "10–40 U/L", result: "30 U/L", interpretation: "N" },
+                    { id: 36, name: "ALT", refRange: "7–56 U/L", result: "27 U/L", interpretation: "N" },
+                    { id: 37, name: "Serum sodium", refRange: "135–145 mmol/L", result: "138 mmol/L", interpretation: "N" },
+                    { id: 38, name: "Serum potassium", refRange: "3.5–5.0 mmol/L", result: "4.2 mmol/L", interpretation: "N" },
+                    { id: 39, name: "Stool occult blood test", refRange: "Negative", result: "Negative", interpretation: "N" },
+                    { id: 40, name: "C-reactive protein (CRP)", refRange: "<5 mg/L", result: "3.5 mg/L", interpretation: "N" }
+                ]
+            },
+            8: {
+                caseNumber: 8,
+                title: "คนที่ 8 IDA",
+                subtitle: "Crohn's disease",
+                labs: [
+                    { id: 1, name: "Hemoglobin (Hb)", refRange: "ชาย 13–17 g/dL; หญิง 12–16 g/dL", result: "8.3 g/dL", interpretation: "↓" },
+                    { id: 2, name: "Mean corpuscular volume (MCV)", refRange: "80–100 fL", result: "68 fL", interpretation: "↓" },
+                    { id: 3, name: "Mean corpuscular hemoglobin (MCH)", refRange: "27–33 pg", result: "22 pg", interpretation: "↓" },
+                    { id: 4, name: "Red cell distribution width (RDW)", refRange: "11.5–14.5%", result: "22%", interpretation: "↑" },
+                    { id: 5, name: "RBC count", refRange: "ชาย 4.5–5.9 ×10⁶/µL; หญิง 4.1–5.1 ×10⁶/µL", result: "3.8 ×10⁶/µL", interpretation: "↓" },
+                    { id: 6, name: "WBC count", refRange: "4.0–10.0 ×10³/µL", result: "12.8 ×10³/µL", interpretation: "↑" },
+                    { id: 7, name: "WBC differential count", refRange: "Neutrophil 40–75%; lymphocyte 20–45%; monocyte 2–10%; eosinophil 1–6%; basophil 0–2%", result: "Neutrophil 78%, Lymphocyte 14%, monocye 6%, Eosinophil 2% Basophil 0%", interpretation: "N" },
+                    { id: 8, name: "Platelet count", refRange: "150–400 ×10³/µL", result: "430 ×10³/µL", interpretation: "↑" },
+                    { id: 9, name: "Corrected reticulocyte count", refRange: "0.5–2.0%", result: "0.80%", interpretation: "N" },
+                    { id: 10, name: "Serum vitamin B12", refRange: "200–900 pg/mL", result: "410 pg/mL", interpretation: "N" },
+                    { id: 11, name: "Absolute neutrophil count (ANC)", refRange: "1.5–8.0 ×10³/µL", result: "9.9 ×10³/µL", interpretation: "↑" },
+                    { id: 12, name: "MCHC", refRange: "32–36 g/dL", result: "31 g/dL", interpretation: "↓" },
+                    { id: 13, name: "Nucleated RBC count", refRange: "0 ×10³/µL ในผู้ใหญ่", result: "0 ×10³/µL", interpretation: "N" },
+                    { id: 14, name: "Prothrombin time", refRange: "PT 11–14 s", result: "12.8 s", interpretation: "N" },
+                    { id: 15, name: "ESR", refRange: "ชาย 0–15 mm/hr; หญิง 0–20 mm/hr", result: "48 mm/hr", interpretation: "↑" },
+                    { id: 16, name: "Serum ferritin", refRange: "ชาย 30–400 ng/mL; หญิง 15–150 ng/mL", result: "6 ng/mL", interpretation: "↓" },
+                    { id: 17, name: "Serum iron", refRange: "60–150 µg/dL", result: "20 µg/dL", interpretation: "↓" },
+                    { id: 18, name: "TIBC", refRange: "240–450 µg/dL", result: "510 µg/dL", interpretation: "↑" },
+                    { id: 19, name: "Transferrin saturation", refRange: "20–50%", result: "4%", interpretation: "↓" },
+                    { id: 20, name: "Hemoglobin analysis (HPLC)", refRange: "HbA 95–98%; HbA₂ 2–3.5%; HbF <1%", result: "Normal", interpretation: "N" },
+                    { id: 21, name: "EMA binding test", refRange: "Normal / no significant reduction in fluorescence", result: "Normal", interpretation: "N" },
+                    { id: 22, name: "Osmotic fragility test", refRange: "Normal; hemolysisเริ่มที่ประมาณ 0.45–0.50% NaCl", result: "Normal", interpretation: "N" },
+                    { id: 23, name: "DAT / Coombs", refRange: "Negative", result: "Negative", interpretation: "N" },
+                    { id: 24, name: "Indirect bilirubin", refRange: "0.2–0.8 mg/dL", result: "0.4 mg/dL", interpretation: "N" },
+                    { id: 25, name: "LDH", refRange: "140–280 U/L", result: "185 U/L", interpretation: "N" },
+                    { id: 26, name: "Serum haptoglobin", refRange: "30–200 mg/dL", result: "115 mg/dL", interpretation: "N" },
+                    { id: 27, name: "Bone marrow aspiration", refRange: "ไม่มี single numerical normal value; blasts <5% และมี normal hematopoietic maturation", result: "Absent iron stores (Prussian blue negative)", interpretation: "Abnormal" },
+                    { id: 28, name: "Serum folate", refRange: ">4 ng/mL", result: "5.8 ng/mL", interpretation: "N" },
+                    { id: 29, name: "Flow cytometry immunophenotyping", refRange: "ไม่มี abnormal clonal population; myeloid blasts โดยทั่วไป <5%", result: "Normal", interpretation: "N" },
+                    { id: 30, name: "BCR::ABL1 detection (FISH)", refRange: "Negative", result: "Negative", interpretation: "N" },
+                    { id: 31, name: "Fasting blood glucose", refRange: "70–99 mg/dL", result: "91 mg/dL", interpretation: "N" },
+                    { id: 32, name: "HbA1c", refRange: "<5.7%", result: "5.3%", interpretation: "N" },
+                    { id: 33, name: "BUN", refRange: "7–20 mg/dL", result: "16 mg/dL", interpretation: "N" },
+                    { id: 34, name: "Creatinine", refRange: "ชาย 0.74–1.35 mg/dL; หญิง 0.59–1.04 mg/dL", result: "0.8 mg/dL", interpretation: "N" },
+                    { id: 35, name: "AST", refRange: "10–40 U/L", result: "24 U/L", interpretation: "N" },
+                    { id: 36, name: "ALT", refRange: "7–56 U/L", result: "20 U/L", interpretation: "N" },
+                    { id: 37, name: "Serum sodium", refRange: "135–145 mmol/L", result: "137 mmol/L", interpretation: "N" },
+                    { id: 38, name: "Serum potassium", refRange: "3.5–5.0 mmol/L", result: "3.9 mmol/L", interpretation: "N" },
+                    { id: 39, name: "Stool occult blood test", refRange: "Negative", result: "Positive", interpretation: "Positive" },
+                    { id: 40, name: "C-reactive protein (CRP)", refRange: "<5 mg/L", result: "28 mg/L", interpretation: "↑" }
+                ]
+            }
+        };
+
+        // State variables
+        let currentScreen = 'code'; // 'code', 'main', 'timesup'
+        let selectedCaseNum = null;
+        let timeLeft = 20 * 60; // 20 minutes in seconds
+        let timerInterval = null;
+        
+        let orderedLabIds = []; // เก็บ ID แล็บที่สั่งตรวจแล้ว
+        let activePopupLab = null; // แล็บที่กำลังเปิดดูรายละเอียด
+        let showOrderedModal = false; // สถานะการเปิด modal รายการที่สั่งแล้ว
+        let searchKeyword = '';
+
+        // Cooldown logic
+        let cooldownSecondsLeft = 0;
+        let cooldownInterval = null;
+        let delayTimes = [10, 20, 30, 40, 60, 75]; // ลำดับเวลาหน่วง: ครั้งที่ 1-6
+
+        function render() {
+            const app = document.getElementById('app');
+            app.innerHTML = '';
+
+            if (currentScreen === 'code') {
+                app.innerHTML = renderCodeScreen();
+            } else if (currentScreen === 'main') {
+                app.innerHTML = renderMainScreen();
+            } else if (currentScreen === 'timesup') {
+                app.innerHTML = renderTimesUpScreen();
+            }
+        }
+
+        // 1. หน้าจอใส่รหัสเคส (1-8)
+        function renderCodeScreen() {
+            return `
+                <div class="flex-1 flex items-center justify-center p-4 bg-gradient-to-br from-slate-900 via-slate-800 to-indigo-950">
+                    <div class="glass p-8 rounded-2xl shadow-2xl max-w-md w-full border border-slate-700 text-center">
+                        <div class="mb-6">
+                            <span class="bg-indigo-500/20 text-indigo-400 text-xs font-semibold px-3 py-1 rounded-full uppercase tracking-wider">Hematology Open House</span>
+                            <h1 class="text-3xl font-bold mt-3 text-white">ระบบสั่งตรวจห้องปฏิบัติการ</h1>
+                            <p class="text-slate-400 text-sm mt-2">กรุณากรอกหมายเลขเคสผู้ป่วยประจำกลุ่มของคุณ (1 ถึง 8)</p>
+                        </div>
+                        
+                        <div class="space-y-4">
+                            <div>
+                                <input type="number" id="caseInput" min="1" max="8" placeholder="ใส่เลขเคส (1 - 8)" 
+                                    class="w-full px-4 py-3 bg-slate-900 border border-slate-700 rounded-xl text-center text-2xl font-bold text-white focus:outline-none focus:ring-2 focus:ring-indigo-500 transition">
+                            </div>
+                            <button onclick="handleStartCase()" 
+                                class="w-full py-3.5 bg-gradient-to-r from-indigo-600 to-violet-600 hover:from-indigo-500 hover:to-violet-500 text-white font-bold rounded-xl shadow-lg shadow-indigo-600/30 transition transform active:scale-95">
+                                เริ่มต้นกิจกรรม (Start)
+                            </button>
+                        </div>
+                        <div id="errorMsg" class="text-rose-400 text-sm mt-3 h-5"></div>
+                    </div>
+                </div>
+            `;
+        }
+
+        function handleStartCase() {
+            const inputVal = document.getElementById('caseInput').value;
+            const caseNum = parseInt(inputVal);
+            const errorMsg = document.getElementById('errorMsg');
+
+            if (!caseNum || caseNum < 1 || caseNum > 8) {
+                errorMsg.innerText = '⚠️ กรุณากรอกหมายเลขเคสให้ถูกต้องระหว่าง 1 ถึง 8';
+                return;
+            }
+
+            selectedCaseNum = caseNum;
+            currentScreen = 'main';
+            startTimer();
+            render();
+        }
+
+        // ตัวนับเวลาถอยหลัง 20 นาที (1200 วินาที)
+        function startTimer() {
+            if (timerInterval) clearInterval(timerInterval);
+            timerInterval = setInterval(() => {
+                if (timeLeft > 0) {
+                    timeLeft--;
+                    updateTimerDisplay();
+                    if (timeLeft === 0) {
+                        clearInterval(timerInterval);
+                        currentScreen = 'timesup';
+                        render();
+                    }
+                }
+            }, 1000);
+        }
+
+        function updateTimerDisplay() {
+            const timerEl = document.getElementById('timerDisplay');
+            if (timerEl) {
+                const mins = Math.floor(timeLeft / 60);
+                const secs = timeLeft % 60;
+                timerEl.innerText = `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
+                if (timeLeft <= 60) {
+                    timerEl.classList.add('text-rose-500', 'animate-pulse');
+                }
+            }
+        }
+
+        // 2. หน้าจอหลัก (Lab Ordering Page)
+        function renderMainScreen() {
+            const caseInfo = casesData[selectedCaseNum];
+            const filteredLabs = caseInfo.labs.filter(lab => 
+                lab.name.toLowerCase().includes(searchKeyword.toLowerCase()) || 
+                lab.id.toString().includes(searchKeyword)
+            );
+
+            const mins = Math.floor(timeLeft / 60);
+            const secs = timeLeft % 60;
+            const timeStr = `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
+
+            return `
+                <div class="min-h-screen flex flex-col bg-slate-950">
+                    <!-- Top Navigation Bar -->
+                    <header class="bg-slate-900 border-b border-slate-800 sticky top-0 z-30 shadow-md">
+                        <div class="max-w-7xl mx-auto px-4 py-3 flex flex-wrap justify-between items-center gap-4">
+                            <div class="flex items-center space-x-3">
+                                <span class="bg-indigo-600 text-white text-sm font-bold px-3 py-1.5 rounded-lg shadow">เคสที่ ${selectedCaseNum}</span>
+                                <div>
+                                    <h2 class="font-bold text-lg text-white">${caseInfo.title}</h2>
+                                    <p class="text-xs text-slate-400">${caseInfo.subtitle || 'ข้อมูลผลตรวจสุขภาพผู้ป่วย'}</p>
+                                </div>
+                            </div>
+
+                            <!-- Timer & Ordered Labs Button -->
+                            <div class="flex items-center space-x-4">
+                                <div class="bg-slate-950 px-4 py-2 rounded-xl border border-slate-800 flex items-center space-x-2">
+                                    <svg class="w-5 h-5 text-indigo-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                                    <span id="timerDisplay" class="font-mono text-xl font-bold ${timeLeft <= 60 ? 'text-rose-500 animate-pulse' : 'text-emerald-400'}">${timeStr}</span>
+                                </div>
+
+                                <button onclick="toggleOrderedModal(true)" class="relative bg-violet-600 hover:bg-violet-500 text-white px-4 py-2 rounded-xl font-medium text-sm transition shadow-lg shadow-violet-600/20 flex items-center space-x-2">
+                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4"></path></svg>
+                                    <span>Ordered Labs</span>
+                                    <span class="absolute -top-2 -right-2 bg-rose-500 text-white text-xs w-6 h-6 rounded-full flex items-center justify-center font-bold border-2 border-slate-900">${orderedLabIds.length}</span>
+                                </button>
+                            </div>
+                        </div>
+                    </header>
+
+                    <!-- Main Content Area -->
+                    <main class="flex-1 max-w-7xl w-full mx-auto p-4 sm:p-6">
+                        <!-- Search & Status Banner -->
+                        <div class="mb-6 flex flex-col sm:flex-row justify-between items-center gap-4">
+                            <div class="w-full sm:w-96 relative">
+                                <span class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-slate-400">
+                                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
+                                </span>
+                                <input type="text" oninput="handleSearch(this.value)" value="${searchKeyword}" placeholder="ค้นหาชื่อแล็บ หรือลำดับที่..." 
+                                    class="w-full pl-10 pr-4 py-2.5 bg-slate-900 border border-slate-800 rounded-xl text-sm text-white focus:outline-none focus:ring-2 focus:ring-indigo-500 transition">
+                            </div>
+                            <div class="text-sm text-slate-400">
+                                รายการตรวจทั้งหมด: <span class="font-bold text-white">${caseInfo.labs.length}</span> รายการ | สั่งตรวจแล้ว: <span class="font-bold text-emerald-400">${orderedLabIds.length}</span> รายการ
+                            </div>
+                        </div>
+
+                        <!-- Labs Grid (40 Labs) -->
+                        <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+                            ${filteredLabs.map(lab => {
+                                const isOrdered = orderedLabIds.includes(lab.id);
+                                return `
+                                    <div onclick="handleSelectLab(${lab.id})" 
+                                        class="glass p-4 rounded-xl border ${isOrdered ? 'border-emerald-500/50 bg-emerald-950/10' : 'border-slate-800 hover:border-indigo-500/50'} cursor-pointer transition transform hover:-translate-y-1 shadow-md flex flex-col justify-between">
+                                        <div>
+                                            <div class="flex justify-between items-start mb-2">
+                                                <span class="text-xs font-mono font-bold bg-slate-800 text-indigo-300 px-2 py-0.5 rounded">#${lab.id}</span>
+                                                ${isOrdered ? '<span class="text-xs bg-emerald-500/20 text-emerald-400 px-2 py-0.5 rounded font-medium">สั่งแล้ว</span>' : '<span class="text-xs text-slate-500">แตะเพื่อสั่งตรวจ</span>'}
+                                            </div>
+                                            <h3 class="font-semibold text-white text-sm line-clamp-2">${lab.name}</h3>
+                                        </div>
+                                        <div class="mt-4 pt-2 border-t border-slate-800/80 flex justify-between items-center text-xs text-slate-400">
+                                            <span class="truncate max-w-[150px]">Ref: ${lab.refRange.split(';')[0]}</span>
+                                            <span class="text-indigo-400 font-medium group-hover:underline">ดูผลตรวจ &rarr;</span>
+                                        </div>
+                                    </div>
+                                `;
+                            }).join('')}
+                        </div>
+                    </main>
+
+                    <!-- Cooldown / Delay Overlay (if counting down) -->
+                    ${cooldownSecondsLeft > 0 ? renderCooldownOverlay() : ''}
+
+                    <!-- Lab Detail Popup Modal -->
+                    ${activePopupLab ? renderPopupModal(activePopupLab) : ''}
+
+                    <!-- Ordered Labs Modal -->
+                    ${showOrderedModal ? renderOrderedModal() : ''}
+                </div>
+            `;
+        }
+
+        function handleSearch(val) {
+            searchKeyword = val;
+            // Re-render only main content grid to preserve input focus smoothly or full render
+            const gridContainer = document.querySelector('.grid');
+            if (gridContainer) {
+                render();
+                // restore focus to search input
+                setTimeout(() => {
+                    const input = document.querySelector('input[type="text"]');
+                    if (input) {
+                        input.focus();
+                        input.setSelectionRange(input.value.length, input.value.length);
+                    }
+                }, 0);
+            }
+        }
+
+        // จัดการเมื่อกดเลือกแล็บ
+        function handleSelectLab(labId) {
+            const caseInfo = casesData[selectedCaseNum];
+            const lab = caseInfo.labs.find(l => l.id === labId);
+            if (!lab) return;
+
+            // ถ้ายังไม่เคยสั่งตรวจแล็บนี้ ให้เริ่มกระบวนการ Cooldown ตามเงื่อนไข (10, 20, 30, 40, 60, 75 วินาที)
+            if (!orderedLabIds.includes(labId)) {
+                const orderCount = orderedLabIds.length;
+                let delay = delayTimes[orderCount] !== undefined ? delayTimes[orderCount] : 75;
+
+                cooldownSecondsLeft = delay;
+                render();
+
+                if (cooldownInterval) clearInterval(cooldownInterval);
+                cooldownInterval = setInterval(() => {
+                    cooldownSecondsLeft--;
+                    if (cooldownSecondsLeft <= 0) {
+                        clearInterval(cooldownInterval);
+                        // บันทึกว่าสั่งตรวจแล้วเมื่อนับถอยหลังเสร็จ
+                        if (!orderedLabIds.includes(labId)) {
+                            orderedLabIds.push(labId);
+                        }
+                        activePopupLab = lab;
+                        cooldownSecondsLeft = 0;
+                        render();
+                    } else {
+                        updateCooldownDisplay();
+                    }
+                }, 1000);
+            } else {
+                // ถ้าเคยสั่งตรวจแล้ว เปิดดูผลได้ทันทีไม่ต้องรอ Cooldown
+                activePopupLab = lab;
+                render();
+            }
+        }
+
+        function updateCooldownDisplay() {
+            const el = document.getElementById('cooldownCounter');
+            if (el) {
+                el.innerText = cooldownSecondsLeft;
+            }
+        }
+
+        function renderCooldownOverlay() {
+            const orderCount = orderedLabIds.length + 1;
+            return `
+                <div class="fixed inset-0 z-50 bg-slate-950/80 backdrop-blur-md flex items-center justify-center p-4">
+                    <div class="glass p-8 rounded-2xl border border-indigo-500/30 text-center max-w-md w-full shadow-2xl animate-fade-in">
+                        <div class="w-16 h-16 bg-indigo-600/20 text-indigo-400 rounded-full flex items-center justify-center mx-auto mb-4">
+                            <svg class="w-8 h-8 animate-spin" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                        </div>
+                        <h3 class="text-xl font-bold text-white mb-2">กำลังส่งตรวจห้องปฏิบัติการ...</h3>
+                        <p class="text-slate-400 text-sm mb-6">คำสั่งซื้อแล็บลำดับที่ ${orderCount} (รอผลตรวจสักครู่)</p>
+                        
+                        <div class="text-5xl font-mono font-extrabold text-indigo-400 mb-2" id="cooldownCounter">${cooldownSecondsLeft}</div>
+                        <p class="text-xs text-slate-500 uppercase tracking-widest">วินาที</p>
+                    </div>
+                </div>
+            `;
+        }
+
+        // ป๊อปอัปแสดงรายละเอียดผลแล็บ
+        function renderPopupModal(lab) {
+            return `
+                <div class="fixed inset-0 z-50 bg-slate-950/70 backdrop-blur-sm flex items-center justify-center p-4">
+                    <div class="bg-slate-900 border border-slate-700 rounded-2xl max-w-lg w-full p-6 shadow-2xl relative text-slate-100">
+                        <button onclick="closePopup()" class="absolute top-4 right-4 text-slate-400 hover:text-white p-2 rounded-lg bg-slate-800/50 hover:bg-slate-800 transition">
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+                        </button>
+
+                        <div class="flex items-center space-x-2 mb-3">
+                            <span class="bg-indigo-600/20 text-indigo-400 text-xs font-mono font-bold px-2.5 py-1 rounded">Lab #${lab.id}</span>
+                            <span class="text-xs bg-emerald-500/20 text-emerald-400 px-2.5 py-1 rounded font-medium">สั่งตรวจสำเร็จ</span>
+                        </div>
+
+                        <h2 class="text-xl font-bold text-white mb-4">${lab.name}</h2>
+
+                        <div class="space-y-4 text-sm">
+                            <div class="bg-slate-950 p-4 rounded-xl border border-slate-800">
+                                <span class="text-slate-400 block text-xs mb-1">ค่าปกติ (Reference Range):</span>
+                                <p class="font-medium text-slate-200 whitespace-pre-line">${lab.refRange}</p>
+                            </div>
+
+                            <div class="bg-indigo-950/30 p-4 rounded-xl border border-indigo-500/30">
+                                <span class="text-indigo-300 block text-xs mb-1">ผลตรวจของผู้ป่วย (Result):</span>
+                                <p class="text-lg font-bold text-white whitespace-pre-line">${lab.result}</p>
+                            </div>
+
+                            <div class="bg-slate-950 p-4 rounded-xl border border-slate-800">
+                                <span class="text-slate-400 block text-xs mb-1">การแปลผล (Interpretation):</span>
+                                <p class="font-semibold text-amber-300 whitespace-pre-line">${lab.interpretation}</p>
+                            </div>
+                        </div>
+
+                        <div class="mt-6">
+                            <button onclick="closePopup()" class="w-full py-3 bg-slate-800 hover:bg-slate-700 text-white font-semibold rounded-xl transition">
+                                ปิดหน้าต่าง (Close)
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+
+        function closePopup() {
+            activePopupLab = null;
+            render();
+        }
+
+        // Modal แสดงรายการแล็บที่สั่งตรวจแล้ว (Ordered Labs Button)
+        function renderOrderedModal() {
+            const caseInfo = casesData[selectedCaseNum];
+            const orderedLabsList = caseInfo.labs.filter(l => orderedLabIds.includes(l.id));
+
+            return `
+                <div class="fixed inset-0 z-50 bg-slate-950/70 backdrop-blur-sm flex items-center justify-center p-4">
+                    <div class="bg-slate-900 border border-slate-700 rounded-2xl max-w-2xl w-full p-6 shadow-2xl relative max-h-[85vh] flex flex-col">
+                        <button onclick="toggleOrderedModal(false)" class="absolute top-4 right-4 text-slate-400 hover:text-white p-2 rounded-lg bg-slate-800/50 hover:bg-slate-800 transition">
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+                        </button>
+
+                        <div class="mb-4">
+                            <h2 class="text-xl font-bold text-white flex items-center space-x-2">
+                                <svg class="w-6 h-6 text-violet-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4"></path></svg>
+                                <span>รายการแล็บที่สั่งตรวจแล้ว (${orderedLabsList.length})</span>
+                            </h2>
+                            <p class="text-xs text-slate-400">คุณสามารถคลิกเพื่อทบทวนผลตรวจย้อนหลังได้ตลอดเวลา</p>
+                        </div>
+
+                        <div class="flex-1 overflow-y-auto space-y-3 pr-2">
+                            ${orderedLabsList.length === 0 ? `
+                                <div class="text-center py-12 text-slate-500">
+                                    <p>ยังไม่มีการสั่งตรวจแล็บใด ๆ</p>
+                                </div>
+                            ` : orderedLabsList.map(lab => `
+                                <div onclick="toggleOrderedModal(false); handleSelectLab(${lab.id})" class="bg-slate-950 p-4 rounded-xl border border-slate-800 hover:border-violet-500 cursor-pointer transition flex justify-between items-center">
+                                    <div>
+                                        <span class="text-xs font-mono text-indigo-400 bg-slate-900 px-2 py-0.5 rounded">#${lab.id}</span>
+                                        <h4 class="font-semibold text-white text-sm mt-1">${lab.name}</h4>
+                                    </div>
+                                    <div class="text-right">
+                                        <span class="text-xs text-emerald-400 font-medium">ผล: ${lab.result}</span>
+                                        <p class="text-xs text-indigo-400 mt-0.5">คลิกดูรายละเอียด &rarr;</p>
+                                    </div>
+                                </div>
+                            `).join('')}
+                        </div>
+
+                        <div class="mt-6 pt-4 border-t border-slate-800">
+                            <button onclick="toggleOrderedModal(false)" class="w-full py-3 bg-slate-800 hover:bg-slate-700 text-white font-semibold rounded-xl transition">
+                                ปิดหน้าต่าง
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+
+        function toggleOrderedModal(show) {
+            showOrderedModal = show;
+            render();
+        }
+
+        // 3. หน้าจอหมดเวลา (Time's Up Screen)
+        function renderTimesUpScreen() {
+            return `
+                <div class="flex-1 flex items-center justify-center p-4 bg-gradient-to-br from-rose-950 via-slate-950 to-slate-900">
+                    <div class="glass p-8 rounded-2xl shadow-2xl max-w-md w-full border border-rose-500/30 text-center">
+                        <div class="w-20 h-20 bg-rose-500/20 text-rose-500 rounded-full flex items-center justify-center mx-auto mb-5 shadow-lg shadow-rose-500/10">
+                            <svg class="w-10 h-10" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path></svg>
+                        </div>
+                        <h1 class="text-3xl font-bold text-white mb-2">หมดเวลาแล้ว! (Time's Up)</h1>
+                        <p class="text-slate-400 text-sm mb-6">เวลาทำกิจกรรม 20 นาทีสิ้นสุดลงแล้ว ผู้เข้าร่วมจะไม่สามารถเปิดดูหรือสั่งตรวจแล็บเพิ่มเติมได้ กรุณาร่วมสรุปผลและรายงานตำรวจ</p>
+
+                        <div class="bg-slate-900/80 p-4 rounded-xl border border-slate-800 mb-6 text-left">
+                            <div class="text-xs text-slate-400 mb-1">สถิติกลุ่มของคุณ:</div>
+                            <p class="text-sm text-slate-200 font-medium">เคสที่ได้รับ: <span class="text-indigo-400 font-bold">คนที่ ${selectedCaseNum} (${casesData[selectedCaseNum].title})</span></p>
+                            <p class="text-sm text-slate-200 font-medium">จำนวนแล็บที่ส่งตรวจ: <span class="text-emerald-400 font-bold">${orderedLabIds.length} รายการ</span></p>
+                        </div>
+
+                        <button onclick="resetActivity()" class="w-full py-3 bg-slate-800 hover:bg-slate-700 text-white font-semibold rounded-xl transition">
+                            กลับสู่หน้าหลัก (Reset)
+                        </button>
+                    </div>
+                </div>
+            `;
+        }
+
+        function resetActivity() {
+            currentScreen = 'code';
+            selectedCaseNum = null;
+            timeLeft = 20 * 60;
+            orderedLabIds = [];
+            activePopupLab = null;
+            showOrderedModal = false;
+            if (timerInterval) clearInterval(timerInterval);
+            if (cooldownInterval) clearInterval(cooldownInterval);
+            render();
+        }
+
+        // Initial render on load
+        window.onload = () => {
+            render();
+        };
+    </script>
+</body>
+</html>
