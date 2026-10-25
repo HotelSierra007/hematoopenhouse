@@ -17,7 +17,7 @@
     <div id="app" class="flex-1 flex flex-col"></div>
 
     <script>
-        // ข้อมูลผลแล็บทั้ง 8 เคส (40 รายการครบถ้วน - แปลง N, ↓, ↑ เป็น Normal, Low, High)
+        // ข้อมูลผลแล็บทั้ง 8 เคส (40 รายการครบถ้วน)
         const casesData = {
             1: {
                 caseNumber: 1,
@@ -408,9 +408,11 @@
         let showOrderedModal = false;
         let searchKeyword = '';
 
-        // Cooldown logic
+        // Cooldown & Admin Bypass logic
         let cooldownSecondsLeft = 0;
         let cooldownInterval = null;
+        let pendingBypassLabId = null;
+        let bypassClickCount = 0;
         let delayTimes = [10, 20, 30, 40, 60, 75]; // ลำดับเวลาหน่วง: ครั้งที่ 1-6
 
         function render() {
@@ -594,6 +596,9 @@
             if (!lab) return;
 
             if (!orderedLabIds.includes(labId)) {
+                pendingBypassLabId = labId;
+                bypassClickCount = 0;
+
                 const orderCount = orderedLabIds.length;
                 let delay = delayTimes[orderCount] !== undefined ? delayTimes[orderCount] : 75;
 
@@ -621,6 +626,22 @@
             }
         }
 
+        function handleAdminBypass() {
+            bypassClickCount++;
+            if (bypassClickCount >= 3) {
+                if (cooldownInterval) clearInterval(cooldownInterval);
+                cooldownSecondsLeft = 0;
+                
+                if (pendingBypassLabId && !orderedLabIds.includes(pendingBypassLabId)) {
+                    orderedLabIds.push(pendingBypassLabId);
+                }
+                const caseInfo = casesData[selectedCaseNum];
+                activePopupLab = caseInfo.labs.find(l => l.id === pendingBypassLabId);
+                bypassClickCount = 0;
+                render();
+            }
+        }
+
         function updateCooldownDisplay() {
             const el = document.getElementById('cooldownCounter');
             if (el) {
@@ -640,7 +661,7 @@
                         <p class="text-slate-400 text-sm mb-6">คำสั่งซื้อแล็บลำดับที่ ${orderCount} (รอผลตรวจสักครู่)</p>
                         
                         <div class="text-5xl font-mono font-extrabold text-indigo-400 mb-2" id="cooldownCounter">${cooldownSecondsLeft}</div>
-                        <p class="text-xs text-slate-500 uppercase tracking-widest">วินาที</p>
+                        <p onclick="handleAdminBypass()" class="text-xs text-slate-500 uppercase tracking-widest cursor-pointer select-none hover:text-indigo-400 transition" title="Admin Bypass (Click 3 times to skip)">วินาที</p>
                     </div>
                 </div>
             `;
@@ -670,11 +691,6 @@
                             <div class="bg-indigo-950/30 p-4 rounded-xl border border-indigo-500/30">
                                 <span class="text-indigo-300 block text-xs mb-1">ผลตรวจของผู้ป่วย (Result):</span>
                                 <p class="text-lg font-bold text-white whitespace-pre-line">${lab.result}</p>
-                            </div>
-
-                            <div class="bg-slate-950 p-4 rounded-xl border border-slate-800">
-                                <span class="text-slate-400 block text-xs mb-1">การแปลผล (Interpretation):</span>
-                                <p class="font-semibold text-amber-300 whitespace-pre-line">${lab.interpretation}</p>
                             </div>
                         </div>
 
