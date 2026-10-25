@@ -17,7 +17,7 @@
     <div id="app" class="flex-1 flex flex-col"></div>
 
     <script>
-        // ข้อมูลผลแล็บทั้ง 8 เคส (อัปเดต FISH เป็นภาพ fish_neg.jpg และ fish_pos.jpg)
+        // ข้อมูลผลแล็บทั้ง 8 เคส
         const casesData = {
             1: {
                 caseNumber: 1,
@@ -398,9 +398,9 @@
         };
 
         // State variables
-        let currentScreen = 'code'; // 'code', 'main', 'timesup'
+        let currentScreen = 'code';
         let selectedCaseNum = null;
-        let timeLeft = 20 * 60; // 20 minutes in seconds
+        let timeLeft = 20 * 60;
         let timerInterval = null;
         
         let orderedLabIds = [];
@@ -408,12 +408,10 @@
         let showOrderedModal = false;
         let searchKeyword = '';
 
-        // Cooldown & Admin Bypass logic
         let cooldownSecondsLeft = 0;
         let cooldownInterval = null;
         let pendingBypassLabId = null;
         let bypassClickCount = 0;
-        // ลำดับเวลาหน่วงใหม่: 10, 20, 30, 40, 50, 60, 75 แล้ว 75 ไปเรื่อยๆ
         let delayTimes = [10, 20, 30, 40, 50, 60, 75];
 
         function render() {
@@ -601,7 +599,7 @@
                 bypassClickCount = 0;
 
                 const orderCount = orderedLabIds.length;
-                let delay = delayTimes[orderCount] !== undefined ? delayTimes[orderCount] : 75; // 10, 20, 30, 40, 50, 60, 75 แล้ว 75 ไปเรื่อยๆ
+                let delay = delayTimes[orderCount] !== undefined ? delayTimes[orderCount] : 75;
 
                 cooldownSecondsLeft = delay;
                 render();
@@ -673,8 +671,7 @@
             if (lab.result === 'fish_img') {
                 resultHtml = `
                     <div class="text-center">
-                        <img src="${lab.image}" alt="FISH Result" class="max-h-72 mx-auto rounded-xl border border-slate-700 shadow-md cursor-pointer hover:opacity-95 transition" onclick="window.open('${lab.image}', '_blank')">
-                        <p class="text-xs text-slate-400 mt-2">คลิกที่รูปภาพเพื่อดูภาพขนาดใหญ่</p>
+                        <img src="${lab.image}" alt="FISH Result" class="max-h-72 mx-auto rounded-xl border border-slate-700 shadow-md">
                     </div>
                 `;
             } else {
@@ -753,7 +750,7 @@
                                         <h4 class="font-semibold text-white text-sm mt-1">${lab.name}</h4>
                                     </div>
                                     <div class="text-right">
-                                        <span class="text-xs text-emerald-400 font-medium">${lab.result === 'fish_img' ? '[ดูรูปผล FISH]' : 'ผล: ' + lab.result}</span>
+                                        <span class="text-xs text-emerald-400 font-medium">${lab.result === 'fish_img' ? '[รูปผล FISH]' : 'ผล: ' + lab.result}</span>
                                         <p class="text-xs text-indigo-400 mt-0.5">คลิกดูรายละเอียด &rarr;</p>
                                     </div>
                                 </div>
