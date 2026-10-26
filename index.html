@@ -17,7 +17,7 @@
     <div id="app" class="flex-1 flex flex-col"></div>
 
     <script>
-        // ข้อมูลผลแล็บทั้ง 8 เคส (พร้อมรูปภาพและ description ใต้ Bone marrow aspiration)
+        // ข้อมูลผลแล็บทั้ง 8 เคส
         const casesData = {
             1: {
                 caseNumber: 1,
@@ -374,7 +374,7 @@
                     { id: 19, name: "Transferrin saturation", refRange: "20–50%", result: "4%" },
                     { id: 20, name: "Hemoglobin analysis (HPLC)", refRange: "HbA 95–98%; HbA₂ 2–3.5%; HbF <1%", result: "Normal" },
                     { id: 21, name: "EMA binding test", refRange: "Normal / no significant reduction in fluorescence", result: "Normal" },
-                    { id: 22, name: "Osmotic fragility test", refRange: "Normal; hemolysisเริ่มที่ประมาณ 0.45–0.50% NaCl", result: "fish_img", image: "of_neg.jpg" },
+                    { id: 22, name: "Osmotic fragility test", refRange: "Normal; hemolysisเริ่มที่ประมาณ 0.45–0.50% NaCl", result: "Normal" },
                     { id: 23, name: "DAT / Coombs", refRange: "Negative", result: "Negative" },
                     { id: 24, name: "Indirect bilirubin", refRange: "0.2–0.8 mg/dL", result: "0.4 mg/dL" },
                     { id: 25, name: "LDH", refRange: "140–280 U/L", result: "185 U/L" },
@@ -669,18 +669,16 @@
         function renderPopupModal(lab) {
             let resultHtml = '';
             if (lab.result === 'fish_img') {
-                let descHtml = lab.description ? `<p class="text-xs text-slate-300 mt-2 whitespace-pre-line text-center bg-slate-900 p-2 rounded-lg border border-slate-800">${lab.description}</p>` : '';
                 resultHtml = `
-                    <div class="text-center">
+                    <div class="text-center space-y-3">
                         <img src="${lab.image}" alt="Lab Result Image" class="max-h-60 mx-auto rounded-xl border border-slate-700 shadow-md">
-                        ${descHtml}
+                        ${lab.description ? `<div class="text-slate-100 text-sm font-semibold bg-slate-800 p-3 rounded-xl border border-slate-700 whitespace-pre-line text-left leading-relaxed shadow">${lab.description}</div>` : ''}
                     </div>
                 `;
             } else {
-                let descHtml = lab.description ? `<p class="text-xs text-slate-300 mt-2 whitespace-pre-line">${lab.description}</p>` : '';
                 resultHtml = `
                     <p class="text-lg font-bold text-white whitespace-pre-line">${lab.result}</p>
-                    ${descHtml}
+                    ${lab.description ? `<div class="text-slate-100 text-sm font-semibold bg-slate-800 p-3 rounded-xl border border-slate-700 whitespace-pre-line text-left mt-2 leading-relaxed shadow">${lab.description}</div>` : ''}
                 `;
             }
 
@@ -705,7 +703,7 @@
                             </div>
 
                             <div class="bg-indigo-950/30 p-4 rounded-xl border border-indigo-500/30">
-                                <span class="text-indigo-300 block text-xs mb-1">ผลตรวจของผู้ป่วย (Result):</span>
+                                <span class="text-indigo-300 block text-xs mb-2">ผลตรวจของผู้ป่วย (Result):</span>
                                 ${resultHtml}
                             </div>
                         </div>
