@@ -17,7 +17,7 @@
     <div id="app" class="flex-1 flex flex-col"></div>
 
     <script>
-        // ข้อมูลผลแล็บทั้ง 8 เคส
+        // ข้อมูลผลแล็บทั้ง 8 เคส (พร้อมรูปภาพ FISH, Osmotic fragility และ Bone marrow aspiration พร้อม Description)
         const casesData = {
             1: {
                 caseNumber: 1,
@@ -412,7 +412,9 @@
         let cooldownInterval = null;
         let pendingBypassLabId = null;
         let bypassClickCount = 0;
-        let delayTimes = [10, 20, 30, 40, 50, 60, 75];
+        
+        // ลำดับเวลาหน่วงใหม่: 10, 20, 30, 40, 60, 75, 90 และ 120 ไปตลอดกาล
+        let delayTimes = [10, 20, 30, 40, 60, 75, 90];
 
         function render() {
             const app = document.getElementById('app');
@@ -589,22 +591,25 @@
             }
         }
 
+        // เมื่อคลิกเลือกแล็บ (แม้กำลังรอดาวน์โหลดอยู่หรือเลือกซ้ำ จะทำการรีเซ็ตเวลารอใหม่ทันที)
         function handleSelectLab(labId) {
             const caseInfo = casesData[selectedCaseNum];
             const lab = caseInfo.labs.find(l => l.id === labId);
             if (!lab) return;
 
             if (!orderedLabIds.includes(labId)) {
+                // รีเซ็ตตัวนับเวลารอใหม่ทุกครั้งที่กดเลือกแล็บ
+                if (cooldownInterval) clearInterval(cooldownInterval);
                 pendingBypassLabId = labId;
                 bypassClickCount = 0;
 
                 const orderCount = orderedLabIds.length;
-                let delay = delayTimes[orderCount] !== undefined ? delayTimes[orderCount] : 75;
+                // ลำดับเวลา: 10, 20, 30, 40, 60, 75, 90 และ 120 (หลังจากนั้น 120 ไปตลอดกาล)
+                let delay = delayTimes[orderCount] !== undefined ? delayTimes[orderCount] : 120;
 
                 cooldownSecondsLeft = delay;
                 render();
 
-                if (cooldownInterval) clearInterval(cooldownInterval);
                 cooldownInterval = setInterval(() => {
                     cooldownSecondsLeft--;
                     if (cooldownSecondsLeft <= 0) {
@@ -623,6 +628,14 @@
                 activePopupLab = lab;
                 render();
             }
+        }
+
+        // ฟังก์ชันยกเลิกการรอ (Cancel / Close button ในหน้าจอรอ)
+        function cancelCooldown() {
+            if (cooldownInterval) clearInterval(cooldownInterval);
+            cooldownSecondsLeft = 0;
+            pendingBypassLabId = null;
+            render();
         }
 
         function handleAdminBypass() {
@@ -651,8 +664,13 @@
         function renderCooldownOverlay() {
             const orderCount = orderedLabIds.length + 1;
             return `
-                <div class="fixed inset-0 z-50 bg-slate-950/80 backdrop-blur-md flex items-center justify-center p-4">
-                    <div class="glass p-8 rounded-2xl border border-indigo-500/30 text-center max-w-md w-full shadow-2xl animate-fade-in">
+                <div class="fixed inset-0 z-50 bg-slate-950/85 backdrop-blur-md flex items-center justify-center p-4">
+                    <div class="glass p-8 rounded-2xl border border-indigo-500/30 text-center max-w-md w-full shadow-2xl relative animate-fade-in">
+                        <!-- ปุ่มกากบาท (Close/Cancel Button) เพื่อยกเลิกการส่งแล็บ -->
+                        <button onclick="cancelCooldown()" class="absolute top-4 right-4 text-slate-400 hover:text-white p-2 rounded-lg bg-slate-800/50 hover:bg-slate-800 transition" title="ยกเลิกการสั่งตรวจ">
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+                        </button>
+
                         <div class="w-16 h-16 bg-indigo-600/20 text-indigo-400 rounded-full flex items-center justify-center mx-auto mb-4">
                             <svg class="w-8 h-8 animate-spin" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
                         </div>
